@@ -1,0 +1,21 @@
+{
+  "name": "@repo/lib",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "exports": {
+    "./auth": "./auth.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5",
+    "@repo/db": "*"
+  },
+  "dependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "bcrypt": "^6.0.0",
+    "zod": "^4.0.17"
+  }
+}
