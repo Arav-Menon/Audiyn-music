@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String     @id @default(uuid())
+  username  String     @unique
+  email     String     @unique
+  password  String
+  // provider  Provider
+  streams   Streams[]
+  upvotes   Upvotes[]
+  room      Room[]
+  roomUser  RoomUser[]
+  createdAt DateTime   @default(now())
+}
+
+model Streams {
+  id          String     @id @default(uuid())
+  type        StreamType
+  url         String
+  extractedId String
+  active      Boolean    @default(true)
+  upvotes     Upvotes[]
+  userId      String
+  user        User       @relation(fields: [userId], references: [id])
+}
+
+model Upvotes {
+  id       String  @id @default(ulid())
+  userId   String
+  streamId String
+  user     User    @relation(fields: [userId], references: [id])
+  Streams  Streams @relation(fields: [streamId], references: [id])
+
+  @@unique([userId, streamId])
+}
+
+model Room {
+  id           String     @id @default(uuid())
+  name         String
+  code         String
+  isPrivate    String
+  password     String
+  createdById  String
+  participants RoomUser[]
+  createdBy    User       @relation(fields: [createdById], references: [id])
+}
+
+model RoomUser {
+  id           String   @id @default(uuid())
+  userId       String
+  roomId       String
+  user         User     @relation(fields: [userId], references: [id])
+  room         Room     @relation(fields: [roomId], references: [id])
+  joinedRoomAt DateTime @default(now())
+
+  @@unique([userId, roomId])
+}
+
+enum StreamType {
+  Spotify
+  Youtube
+}
+
+enum Provider {
+  Google
+  Spotify
+}
