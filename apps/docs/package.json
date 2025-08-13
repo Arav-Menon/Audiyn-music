@@ -4,7 +4,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack --port 3001",
+    "dev": "next dev --turbopack --port 3000",
     "build": "next build",
     "start": "next start",
     "lint": "next lint --max-warnings 0",
@@ -12,6 +12,9 @@
   },
   "dependencies": {
     "@repo/ui": "*",
+    "@types/jsonwebtoken": "^9.0.10",
+    "cookies": "^0.9.1",
+    "jsonwebtoken": "^9.0.2",
     "next": "^15.4.2",
     "next-auth": "^4.24.11",
     "react": "^19.1.0",
