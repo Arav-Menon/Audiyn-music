@@ -14,7 +14,9 @@
       "version": "0.1.0",
       "dependencies": {
         "@repo/ui": "*",
+        "@types/bcrypt": "^6.0.0",
         "@types/jsonwebtoken": "^9.0.10",
+        "bcrypt": "^6.0.0",
         "cookies": "^0.9.1",
         "jsonwebtoken": "^9.0.2",
         "next": "^15.4.2",
