@@ -82,7 +82,7 @@ export async function DELETE() {
     });
     return NextResponse.json({
       message: "User deleted",
-      deleteUser,
+      deleteUser, 
     });
   } catch (error) {
     return NextResponse.json({
