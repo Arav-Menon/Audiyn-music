@@ -75,3 +75,28 @@ export const authSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
 });
+
+export const roomSchema = z
+  .object({
+    name: z
+      .string()
+      .min(3, { message: "room name must be atleast 3 characters" })
+      .max(15, { message: "room name cannot be go longer than 15 characters" }),
+    code: z
+      .string()
+      .min(5, { message: "room code must be start from 100 character" })
+      .max(100, {
+        message: "room code cannot be go longer than 99999 characters ",
+      }),
+    isPrivate: z.boolean().default(false),
+    password: z.string().min(4).optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.isPrivate && (!data.password || data.password.trim() == "")) {
+      ctx.addIssue({
+        path: ["password"],
+        message: "Password is required for private rooms",
+        code: z.ZodIssueCode.custom,
+      });
+    }
+  });
