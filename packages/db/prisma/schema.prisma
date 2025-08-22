@@ -45,8 +45,8 @@ model Room {
   id           String     @id @default(uuid())
   name         String
   code         String
-  isPrivate    String
-  password     String
+  isPrivate    Boolean    @default(false)
+  password     String?
   createdById  String
   participants RoomUser[]
   createdBy    User       @relation(fields: [createdById], references: [id])
