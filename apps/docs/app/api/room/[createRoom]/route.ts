@@ -17,10 +17,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const parsedData = roomSchema.safeParse(body);
 
-    if (!parsedData) return NextResponse.json({ error: "Input validation" });
+    if (!parsedData.success)
+      return NextResponse.json({ error: parsedData.error.issues });
 
-    //@ts-ignore
-    const { name, code, isPrivate, password} = parsedData.data;
+    const { name, code, isPrivate, password } = parsedData.data;
 
     if (!name || !code)
       return NextResponse.json(
@@ -28,13 +28,18 @@ export async function POST(req: NextRequest) {
         { status: 404 }
       );
 
-    const hashPassword = await bcrypt.hash(password, 10);
+    let hashPassword: string | null = null;
+
+    if (isPrivate && password) {
+      hashPassword = await bcrypt.hash(password, 10);
+    }
+
     const newRoom = await db.room.create({
       data: {
         name,
         code,
         isPrivate,
-        password: hashPassword,
+        password: hashPassword ?? null,
         participants: {
           connect: {
             id: userId,
