@@ -100,3 +100,13 @@ export const roomSchema = z
       });
     }
   });
+
+export const roomJoinSchema = z.object({
+  code: z
+    .string()
+    .min(5, { message: "room code must be start from 100 character" })
+    .max(100, {
+      message: "room code cannot be go longer than 99999 characters ",
+    }),
+  password: z.string().min(4).optional(),
+});
