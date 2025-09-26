@@ -43,13 +43,14 @@ model Upvotes {
 
 model Room {
   id           String     @id @default(uuid())
-  name         String
+  name         String     @unique
   code         String
   isPrivate    Boolean    @default(false)
   password     String?
   createdById  String
   participants RoomUser[]
   createdBy    User       @relation(fields: [createdById], references: [id])
+  createdAt    DateTime   @default(now())
 }
 
 model RoomUser {
