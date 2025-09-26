@@ -3,8 +3,13 @@
   "module": "index.ts",
   "type": "module",
   "private": true,
-  "exports" : {
-    "./db" : "./index.ts"
+  "scripts": {
+    "generate": "bunx prisma generate",
+    "studio": "bunx prisma studio",
+    "migrate": "bunx prisma migrate dev "
+  },
+  "exports": {
+    "./db": "./index.ts"
   },
   "devDependencies": {
     "@types/bun": "latest"
