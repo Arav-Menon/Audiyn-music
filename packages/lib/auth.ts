@@ -54,6 +54,7 @@ export const authOptions: NextAuthOptions = {
             username: existUser.username,
             email: existUser.email,
             token,
+            // You can add extra fields here if needed
           };
         }
 
@@ -79,6 +80,7 @@ export const authOptions: NextAuthOptions = {
           username: createUser.username,
           email: createUser.email,
           token,
+          // You can add extra fields here if needed
         };
       },
     }),
@@ -88,4 +90,20 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
   ],
+
+  callbacks: {
+    async session({ session, user, token }) {
+      if (session.user) {
+        (session.user as typeof session.user & { id?: string }).id = user.id;
+        // Add extra fields to the session object here
+        // For example:
+        // (session.user as any).token = token?.token;
+        // (session.user as any).role = user.role;
+      }
+      return session;
+    },
+  },
+  pages: {
+    signIn: "/signin",
+  },
 };
