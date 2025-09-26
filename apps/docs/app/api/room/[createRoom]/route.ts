@@ -10,9 +10,6 @@ export async function POST(req: NextRequest) {
   if (!session)
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
-  //@ts-ignore
-  const userId = session.user?.id;
-
   try {
     const body = await req.json();
     const parsedData = roomSchema.safeParse(body);
@@ -33,6 +30,19 @@ export async function POST(req: NextRequest) {
     if (isPrivate && password) {
       hashPassword = await bcrypt.hash(password, 10);
     }
+
+    // Type assertion to include 'id' on user
+    const userId = (session.user as typeof session.user & { id?: string })?.id;
+
+    if (!userId) {
+      return NextResponse.json(
+        { message: "User ID not found in session" },
+        { status: 400 }
+      );
+    }
+    // The callbacks property you mentioned should be added to your NextAuth configuration,
+    // typically in your authOptions object (not here in the route handler).
+    // Here, you don't need to add anything extra.
 
     const newRoom = await db.room.create({
       data: {
