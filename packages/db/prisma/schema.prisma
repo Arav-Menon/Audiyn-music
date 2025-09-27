@@ -44,7 +44,7 @@ model Upvotes {
 model Room {
   id          String   @id @default(uuid())
   name        String   @unique
-  code        String
+  code        String   @unique
   isPrivate   Boolean  @default(false)
   password    String?
   createdById String
