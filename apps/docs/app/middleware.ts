@@ -13,6 +13,7 @@ export const middleware = (req: NextRequest, res: NextResponse) => {
 
     return NextResponse.next();
   } catch (error) {
+    NextResponse.json(error, { status: 500 });
     console.log(error);
   }
 };
