@@ -42,15 +42,14 @@ model Upvotes {
 }
 
 model Room {
-  id           String     @id @default(uuid())
-  name         String     @unique
-  code         String
-  isPrivate    Boolean    @default(false)
-  password     String?
-  createdById  String
-  participants RoomUser[]
-  createdBy    User       @relation(fields: [createdById], references: [id])
-  createdAt    DateTime   @default(now())
+  id          String   @id @default(uuid())
+  name        String   @unique
+  code        String
+  isPrivate   Boolean  @default(false)
+  password    String?
+  createdById String
+  createdBy   User     @relation(fields: [createdById], references: [id])
+  createdAt   DateTime @default(now())
 }
 
 model RoomUser {
@@ -58,7 +57,6 @@ model RoomUser {
   userId       String
   roomId       String
   user         User     @relation(fields: [userId], references: [id])
-  room         Room     @relation(fields: [roomId], references: [id])
   joinedRoomAt DateTime @default(now())
 
   @@unique([userId, roomId])
