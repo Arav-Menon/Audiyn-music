@@ -5,7 +5,6 @@ import SpotifyProvider from "next-auth/providers/spotify";
 import { db } from "@repo/db/db";
 import { authSchema } from "./validations";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -42,19 +41,10 @@ export const authOptions: NextAuthOptions = {
 
           if (!validPassword) throw new Error("Invalid Password");
 
-          const token = jwt.sign(
-            {
-              user_id: existUser.id,
-            },
-            process.env.NEXTAUTH_SECRET!
-          );
-
           return {
             id: existUser.id,
             username: existUser.username,
             email: existUser.email,
-            token,
-            // You can add extra fields here if needed
           };
         }
 
@@ -68,19 +58,10 @@ export const authOptions: NextAuthOptions = {
           },
         });
 
-        const token = jwt.sign(
-          {
-            user_id: createUser.id,
-          },
-          process.env.NEXTAUTH_SECRET!
-        );
-
         return {
           id: createUser.id,
           username: createUser.username,
           email: createUser.email,
-          token,
-          // You can add extra fields here if needed
         };
       },
     }),
@@ -91,19 +72,30 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
 
+  secret: process.env.NEXTAUTH_SECRET,
+
+  session: {
+    strategy: "jwt",
+  },
+
   callbacks: {
-    async session({ session, user, token }) {
-      if (session.user) {
-        (session.user as typeof session.user & { id?: string }).id = user.id;
-        // Add extra fields to the session object here
-        // For example:
-        // (session.user as any).token = token?.token;
-        // (session.user as any).role = user.role;
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.email = user.email;
+      }
+      return token;
+    },
+
+    async session({ session, token }) {
+      if (token) {
+        session.user = {
+          ...session.user,
+          id: token.id as string,
+          email: token.email as string,
+        } as any;
       }
       return session;
     },
-  },
-  pages: {
-    signIn: "/signin",
   },
 };
