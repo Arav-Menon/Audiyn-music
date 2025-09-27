@@ -31,8 +31,7 @@ export async function POST(req: NextRequest) {
       hashPassword = await bcrypt.hash(password, 10);
     }
 
-    // Type assertion to include 'id' on user
-    const userId = (session.user as typeof session.user & { id?: string })?.id;
+    const userId = session.user.id;
 
     if (!userId) {
       return NextResponse.json(
@@ -40,9 +39,6 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-    // The callbacks property you mentioned should be added to your NextAuth configuration,
-    // typically in your authOptions object (not here in the route handler).
-    // Here, you don't need to add anything extra.
 
     const newRoom = await db.room.create({
       data: {
@@ -50,11 +46,6 @@ export async function POST(req: NextRequest) {
         code,
         isPrivate,
         password: hashPassword ?? null,
-        participants: {
-          connect: {
-            id: userId,
-          },
-        },
         createdById: userId,
       },
     });
@@ -63,14 +54,10 @@ export async function POST(req: NextRequest) {
       data: {
         user: {
           connect: {
-            id: userId,
+            id: newRoom.createdById,
           },
         },
-        room: {
-          connect: {
-            id: newRoom.id,
-          },
-        },
+        roomId: newRoom.id,
       },
     });
 
