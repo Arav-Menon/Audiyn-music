@@ -1,6 +1,7 @@
 "use client";
 
 import { signIn, signOut, useSession } from "next-auth/react";
+import Image from "next/image";
 
 export default function Home() {
   const { data: session } = useSession();
@@ -10,6 +11,7 @@ export default function Home() {
   return (
     <>
       <p>Welcome {session} </p>
+      <Image src={"/logo.png"} alt={"logo"} width={100} height={24} />
     </>
   );
 }
