@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@repo/db/db";
 import { getServerSession } from "next-auth";
-import { json } from "stream/consumers";
 
 export async function DELETE({ params }: { params: { roomId: string } }) {
   const session = await getServerSession();
@@ -9,7 +8,7 @@ export async function DELETE({ params }: { params: { roomId: string } }) {
   if (!session)
     return NextResponse.json(
       { message: "User is not authenticated" },
-      { status: 404 }
+      { status: 403  }
     );
 
   try {
