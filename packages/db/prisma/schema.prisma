@@ -47,8 +47,8 @@ model Room {
   code        String   @unique
   isPrivate   Boolean  @default(false)
   password    String?
-  createdById String
-  createdBy   User     @relation(fields: [createdById], references: [id])
+  adminId String
+  createdBy   User     @relation(fields: [adminId], references: [id])
   createdAt   DateTime @default(now())
 }
 
