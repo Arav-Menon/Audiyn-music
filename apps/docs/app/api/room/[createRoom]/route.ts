@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
         code,
         isPrivate,
         password: hashPassword ?? null,
-        createdById: userId,
+        adminId: userId,
       },
     });
 
@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
       data: {
         user: {
           connect: {
-            id: newRoom.createdById,
+            id: newRoom.adminId,
           },
         },
         roomId: newRoom.id,

@@ -8,7 +8,7 @@ export async function DELETE({ params }: { params: { roomId: string } }) {
   if (!session)
     return NextResponse.json(
       { message: "User is not authenticated" },
-      { status: 403  }
+      { status: 403 }
     );
 
   try {
@@ -26,7 +26,7 @@ export async function DELETE({ params }: { params: { roomId: string } }) {
     if (!room)
       return NextResponse.json({ message: "Room not found" }, { status: 404 });
 
-    if (session.user.id === room.createdById) {
+    if (session.user.id === room.adminId) {
       const deleteRoom = await db.room.delete({
         where: {
           id: room.id,
