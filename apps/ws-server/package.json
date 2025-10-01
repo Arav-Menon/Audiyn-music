@@ -2,11 +2,18 @@
   "name": "ws-server",
   "module": "index.ts",
   "type": "module",
+  "scripts": {
+    "dev": "bun server.ts"
+  },
   "private": true,
   "devDependencies": {
     "@types/bun": "latest"
   },
   "peerDependencies": {
     "typescript": "^5"
+  },
+  "dependencies": {
+    "@types/ws": "^8.18.1",
+    "ws": "^8.18.3"
   }
 }
