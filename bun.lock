@@ -39,7 +39,10 @@
     "apps/ws-server": {
       "name": "ws-server",
       "dependencies": {
+        "@repo/db": "*",
+        "@types/jsonwebtoken": "^9.0.10",
         "@types/ws": "^8.18.1",
+        "jsonwebtoken": "^9.0.2",
         "ws": "^8.18.3",
       },
       "devDependencies": {
