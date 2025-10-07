@@ -15,4 +15,4 @@ wss.on("connection", (socket) => {
   socket.on("disconnect", () => room.removeUser(socket));
 });
 
-console.log(`Server is running `);
+console.log(`Server is running`);
