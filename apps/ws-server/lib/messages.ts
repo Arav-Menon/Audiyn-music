@@ -1,1 +1,1 @@
-export const JOIN_ROOM = "join_room";
+export const JOIN_ROOM = "JOIN_ROOM";
