@@ -3,13 +3,6 @@ import { JOIN_ROOM } from "./lib/messages";
 import { db } from "@repo/db/db";
 
 export class Room {
-  private roomId: [];
-  private adminId: [];
-  constructor() {
-    this.roomId = [];
-    this.adminId = [];
-  }
-
   joinRoom(socket: WebSocket) {
     this.addHandler(socket);
     // socket.send("user has been joined");
