@@ -1,11 +1,6 @@
-import WebSocket, { WebSocketServer } from "ws";
+import WebSocket from "ws";
 import { JOIN_ROOM } from "./lib/messages";
 import { db } from "@repo/db/db";
-
-interface Room_Admin {
-  roomId: string;
-  adminId: string;
-}
 
 export class Room {
   private roomId: [];
@@ -17,15 +12,28 @@ export class Room {
 
   joinRoom(socket: WebSocket) {
     this.addHandler(socket);
+    // socket.send("user has been joined");
+    // console.log("User join the room");
   }
-  removeUser(socket: WebSocket) {}
+  removeUser(socket: WebSocket) {
+    console.log("User leave the room");
+    socket.send(
+      JSON.stringify({
+        message: "Disconnected",
+      })
+    );
+  }
 
   private addHandler(socket: WebSocket) {
     socket.on("message", async (data) => {
       const message = JSON.parse(data.toString());
       if (message.type == JOIN_ROOM) {
         const { code, password } = message.payload || {};
-        if (!code && !password)
+
+        const codes = { code, password };
+        console.log(codes);
+
+        if (!code)
           return socket.send(
             JSON.stringify({
               type: "Error",
@@ -37,10 +45,11 @@ export class Room {
           where: { code: code },
         });
 
-        if (!findRoom)
-          return socket.send(
-            JSON.stringify({ type: "Error", message: "room not found" })
-          );
+        console.log(findRoom);
+
+        if (!findRoom) return console.log("not found the room");
+        // socket.send(
+        //   JSON.stringify({ type: "Error", message: "room not found" })
 
         if (findRoom.isPrivate == true) {
           if (!password || findRoom.password !== password)
@@ -51,23 +60,42 @@ export class Room {
               })
             );
 
-          const joinRoom = await db.roomUser.create({
+          const roomAdded = await db.roomUser.create({
             data: {
               user: {
                 connect: {
-                  id: (socket as any).userId,
+                  id: "13233d5f-254a-4a4f-b52f-b4498bebab82",
                 },
               },
               roomId: findRoom.id,
             },
           });
 
+          console.log(roomAdded);
           socket.send(
             JSON.stringify({
               type: "JOIN_SUCCESS",
             })
           );
         }
+
+        const roomAdded = await db.roomUser.create({
+          data: {
+            user: {
+              connect: {
+                id: "13233d5f-254a-4a4f-b52f-b4498bebab82",
+              },
+            },
+            roomId: findRoom.id,
+          },
+        });
+
+        console.log(roomAdded);
+        socket.send(
+          JSON.stringify({
+            type: "JOIN_SUCCESS",
+          })
+        );
       }
     });
   }
