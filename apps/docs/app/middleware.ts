@@ -9,7 +9,7 @@ export const middleware = (req: NextRequest) => {
   }
 
   try {
-    jwt.verify(token, process.env.NEXTAUTH_SECRET || "o9WuIIInMWoA5jSbOj6M");
+    jwt.verify(token, process.env.NEXTAUTH_SECRET!);
 
     return NextResponse.next();
   } catch (error) {
