@@ -71,7 +71,7 @@ import z from "zod";
 // export type AuthInput = z.infer<typeof authSchema>;
 
 export const authSchema = z.object({
-  username: z.string(),
+  username: z.string().optional(),
   email: z.string().email(),
   password: z.string().min(6),
 });
