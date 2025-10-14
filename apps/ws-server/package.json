@@ -14,8 +14,10 @@
   },
   "dependencies": {
     "@repo/db": "*",
+    "@repo/redis": "*",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/ws": "^8.18.1",
+    "dotenv": "^17.2.3",
     "jsonwebtoken": "^9.0.2",
     "ws": "^8.18.3"
   }
