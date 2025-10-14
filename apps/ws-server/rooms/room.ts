@@ -1,13 +1,7 @@
 import WebSocket from "ws";
 import { JOIN_ROOM } from "../lib/messages";
 import { db } from "@repo/db/db";
-import { memoryRoomStore } from "../memory/memoryStore";
-// import { MemoryStore } from "../memory/memoryStore";
 
-// const memoryStore = new MemoryStore();
-
-let currentCode = "";
-let currentUserId = "";
 export class Room {
   joinRoom(socket: WebSocket) {
     this.addHandler(socket);
@@ -41,8 +35,6 @@ export class Room {
         const message = JSON.parse(data.toString());
         if (message.type == JOIN_ROOM) {
           const { code, password } = message.payload || {};
-
-          currentCode = message.code;
 
           const codes = { code, password };
           console.log(codes);
