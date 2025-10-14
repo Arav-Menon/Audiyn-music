@@ -30,6 +30,8 @@ export class Room {
   }
 
   private addHandler(socket: WebSocket) {
+    //@ts-ignore
+    const userId = socket.userId;
     socket.on("message", async (data) => {
       try {
         const message = JSON.parse(data.toString());
@@ -71,7 +73,7 @@ export class Room {
               data: {
                 user: {
                   connect: {
-                    id: "13233d5f-254a-4a4f-b52f-b4498bebab82",
+                    id: userId,
                   },
                 },
                 roomId: findRoom.id,
@@ -96,10 +98,6 @@ export class Room {
               roomId: findRoom.id,
             },
           });
-
-          // push it to the in memory classes
-
-          // memoryRoomStore.addUser(currentRoomId, { userId :  })
 
           socket.send(
             JSON.stringify({
