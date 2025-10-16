@@ -1,8 +1,15 @@
 import WebSocket from "ws";
 
-export class MemoryStore {
+interface AddToRoom {
+  socket: WebSocket;
+  roomId: string;
+}
+
+class MemoryStore {
   private activeUsers = new Map<string, WebSocket>();
   private roomMembers = new Map<string, Set<string>>();
+
+  addToRoom;
 
   addUser(userId: string, socket: WebSocket) {
     this.activeUsers.set(userId, socket);
@@ -45,3 +52,5 @@ export class MemoryStore {
     }
   }
 }
+
+export const Store = new MemoryStore();
