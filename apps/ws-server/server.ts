@@ -1,6 +1,7 @@
 import { WebSocketServer } from "ws";
 import { Room } from "./rooms/room";
 import { JoinedMembers } from "./rooms/broadcast_member";
+import { chat } from "./chat/chat";
 
 const PORT = Number(process.env.PORT);
 
@@ -10,10 +11,13 @@ const room = new Room();
 const joinedMembers = new JoinedMembers();
 
 wss.on("connection", (socket) => {
-  try {
-    room.joinRoom(socket);
+  console.log("user connected");
 
-    joinedMembers.member(socket);
+  try {
+    chat.handleMessage(socket);
+    // room.joinRoom(socket);
+
+    // joinedMembers.member(socket);
 
     socket.on("close", () => room.removeUser(socket));
   } catch (err) {
