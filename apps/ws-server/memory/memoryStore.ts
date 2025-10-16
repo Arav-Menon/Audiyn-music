@@ -7,9 +7,11 @@ interface AddToRoom {
 
 class MemoryStore {
   private activeUsers = new Map<string, WebSocket>();
-  private roomMembers = new Map<string, Set<string>>();
+  private roomMembers = new Map<string, Set<string>>();          
 
-  addToRoom;
+  addToRoom() {
+
+  }
 
   addUser(userId: string, socket: WebSocket) {
     this.activeUsers.set(userId, socket);
