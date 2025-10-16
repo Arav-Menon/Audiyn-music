@@ -1,8 +1,6 @@
 import { WebSocketServer } from "ws";
 import { Room } from "./rooms/room";
 import { JoinedMembers } from "./rooms/broadcast_member";
-import jwt from "jsonwebtoken";
-import { wsAuthMiddleware } from "./middleware";
 
 const PORT = Number(process.env.PORT);
 
@@ -13,9 +11,7 @@ const joinedMembers = new JoinedMembers();
 
 wss.on("connection", (socket) => {
   try {
-    wsAuthMiddleware(() => {
-      room.joinRoom(socket);
-    });
+    room.joinRoom(socket);
 
     joinedMembers.member(socket);
 
