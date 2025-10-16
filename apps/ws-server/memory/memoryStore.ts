@@ -1,27 +1,47 @@
-type UserData = {
-  userId: string;
-  socket?: WebSocket;
-};
+import WebSocket from "ws";
 
-export class MemoryRoomStore {
-  private rooms: Record<string, UserData[]> = {};
+export class MemoryStore {
+  private activeUsers = new Map<string, WebSocket>();
+  private roomMembers = new Map<string, Set<string>>();
 
-  addUser(code: string, user: UserData) {
-    if (!this.rooms[code]) this.rooms[code] = [];
-
-    if (!this.rooms[code].some((u) => u.userId === user.userId)) {
-      this.rooms[code].push(user);
+  addUser(userId: string, socket: WebSocket) {
+    this.activeUsers.set(userId, socket);
+  }
+  removeUser(userId: string) {
+    this.activeUsers.delete(userId);
+    for (const [roomId, users] of this.roomMembers.entries()) {
+      users.delete(userId);
+      if (users.size == 0) this.roomMembers.delete(roomId);
     }
   }
-
-  removeUser(code: string, userId: string) {
-    if (!this.rooms[code]) return;
-    this.rooms[code] = this.rooms[code].filter((u) => u.userId !== userId);
+  getUserSocket(userId: string) {
+    return this.activeUsers.get(userId);
   }
+  addUserToRoom(roomId: string, userId: string) {
+    if (!this.roomMembers.has(roomId)) this.roomMembers.set(roomId, new Set());
+    this.roomMembers.get(roomId)?.add(userId);
+  }
+  removeUserFromRoom(roomId: string, userId: string) {
+    if (this.roomMembers.has(roomId)) {
+      this.roomMembers.get(roomId)?.delete(userId);
 
-  getUserCount(code: string) {
-    return this.rooms[code]?.length || 0;
+      if (this.roomMembers.get(roomId)?.size == 0)
+        this.roomMembers.delete(roomId);
+    }
+  }
+  getRoomMembers(roomId: string) {
+    return this.roomMembers.get(roomId) || new Set();
+  }
+  broadcastToRoom(roomId: string, message: any) {
+    const members = this.roomMembers.get(roomId);
+    if (!members) return;
+
+    for (const userId of members) {
+      const client = this.activeUsers.get(userId);
+
+      if (client?.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify(message));
+      }
+    }
   }
 }
-
-export const memoryRoomStore = new MemoryRoomStore();
