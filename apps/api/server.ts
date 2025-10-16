@@ -11,7 +11,7 @@ const app = express();
 app.use(express.json());
 
 // user
-app.use("/auth", userRouter);
+app.use("/user", userRouter);
 app.use("/user", updateUserRouter),
 app.use("/user", deleteRoomRouter),
 app.use("/user", userProfileRouter);
