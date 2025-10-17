@@ -12,9 +12,9 @@ app.use(express.json());
 
 // user
 app.use("/user", userRouter);
-app.use("/user", updateUserRouter),
-app.use("/user", deleteRoomRouter),
-app.use("/user", userProfileRouter);
+(app.use("/user", updateUserRouter),
+  app.use("/user", deleteRoomRouter),
+  app.use("/user", userProfileRouter));
 
 // room
 app.use("/room", createRoomRouter);
