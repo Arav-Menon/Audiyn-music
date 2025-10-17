@@ -1,135 +1,81 @@
-# Turborepo starter
+# 🎧 Audiyn Music
 
-This Turborepo starter is maintained by the Turborepo core team.
+> A collaborative music platform where everyone decides what plays next.  
+> Users can upvote or suggest songs from **Spotify** or **YouTube**, making group listening sessions fun and democratic.
 
-## Using this example
+<p align="center">
+  <img src="https://img.shields.io/badge/Built%20with-Bun-orange?style=for-the-badge&logo=bun" />
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" />
+  <img src="https://img.shields.io/badge/Next.js-black?style=for-the-badge&logo=nextdotjs" />
+  <img src="https://img.shields.io/badge/Express.js-grey?style=for-the-badge&logo=express" />
+  <img src="https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white" />
+  <img src="https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white" />
+  <img src="https://img.shields.io/badge/Turborepo-black?style=for-the-badge&logo=turborepo" />
+</p>
 
-Run the following command:
+---
 
-```sh
-npx create-turbo@latest
-```
+## 🚀 Overview
 
-## What's inside?
+**Audiyn Music** is a real-time, full-stack application built using a **monorepo** architecture powered by **Bun**.  
+It allows users to connect, join rooms, and collectively decide which song should play next — powered by **WebSockets**, **REST APIs**, and **Spotify integration**.
 
-This Turborepo includes the following packages/apps:
+This project is fully open source and aims to explore scalable architecture, modern DevOps practices, and open collaboration.
 
-### Apps and Packages
+---
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+## 🧱 Tech Stack
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+| Layer | Technology |
+|-------|-------------|
+| **Language** | TypeScript |
+| **Runtime** | Bun |
+| **Frontend** | Next.js, Tailwind CSS, ShadCN UI |
+| **Backend** | Express.js + WebSocket |
+| **Database** | PostgreSQL (via Prisma ORM) |
+| **Cache/Queue** | Redis |
+| **API Integrations** | Spotify API, YouTube API |
+| **Infrastructure** | Monorepo (managed by Turborepo) |
+| **Dev Tools** | ESLint, Prettier, Husky (for lint-staged commits) |
+| **Future Setup** | Docker, Docker Compose, CI/CD Pipeline |
 
-### Utilities
+---
 
-This Turborepo has some additional tools already setup for you:
+## 🗂️ Monorepo Structure
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
 
-### Build
+---
 
-To build all apps and packages, run the following command:
+## ⚙️ Getting Started
 
-```
-cd my-turborepo
+### 1️⃣ Clone the Repository
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
+```bash
+git clone https://github.com/yourusername/audiyn-music.git
+cd audiyn-music
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
-```
+bun install
+cp .env.example .env
 
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+✅ Real-time collaborative music control
+✅ Spotify API integration
+✅ WebSocket-based live updates
+✅ Modern UI built with ShadCN & Tailwind
+✅ Monorepo architecture using Turborepo
+✅ Scalable backend with Redis and PostgreSQL
+✅ TypeScript across the stack
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
+FUTURE ROADMAP
 
-### Develop
+ Add Docker & Docker Compose support
 
-To develop all apps and packages, run the following command:
+ Add CI/CD pipeline (GitHub Actions)
 
-```
-cd my-turborepo
+ Implement authentication system
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
+ Add persistent queue management
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
+ Mobile-friendly PWA version
 
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+ Deploy to production (Render / Vercel / Railway)
