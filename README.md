@@ -1,7 +1,13 @@
-# 🎧 Audiyn Music
+<p align="center">
+  <img src="./logo.png" width="120" alt="Audiyn Logo" />
+</p>
 
-> A collaborative music platform where everyone decides what plays next.  
-> Users can upvote or suggest songs from **Spotify** or **YouTube**, making group listening sessions fun and democratic.
+<h1 align="center">🎧 Audiyn Music</h1>
+
+<p align="center">
+  A collaborative music platform where everyone decides what plays next.  
+  Built using <b>Bun</b>, <b>TypeScript</b>, and <b>modern real-time architecture</b>.
+</p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Built%20with-Bun-orange?style=for-the-badge&logo=bun" />
@@ -15,12 +21,20 @@
 
 ---
 
+## 🖼️ UI Preview
+
+<p align="center">
+  <img src="./Room_dashboard.png" width="90%" alt="Audiyn Dashboard Preview" />
+</p>
+
+---
+
 ## 🚀 Overview
 
 **Audiyn Music** is a real-time, full-stack application built using a **monorepo** architecture powered by **Bun**.  
 It allows users to connect, join rooms, and collectively decide which song should play next — powered by **WebSockets**, **REST APIs**, and **Spotify integration**.
 
-This project is fully open source and aims to explore scalable architecture, modern DevOps practices, and open collaboration.
+This project is fully open source and designed for scalability, performance, and developer collaboration.
 
 ---
 
@@ -42,7 +56,6 @@ This project is fully open source and aims to explore scalable architecture, mod
 ---
 
 ## 🗂️ Monorepo Structure
-
 
 ---
 
