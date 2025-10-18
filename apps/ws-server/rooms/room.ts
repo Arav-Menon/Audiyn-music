@@ -1,28 +1,36 @@
 import WebSocket from "ws";
-import { JOIN_ROOM } from "../lib/messages";
+import { JOIN_ROOM, LEAVE_ROOM } from "../lib/messages";
 import { db } from "@repo/db/db";
+import { FileWatcherEventKind, WatchDirectoryFlags } from "typescript";
 
 export class Room {
   joinRoom(socket: WebSocket) {
     this.addHandler(socket);
   }
   removeUser(socket: WebSocket) {
-    console.log("User leave the room");
-
+    console.log("user leave the room");
     this.removeHandler(socket);
   }
 
   private async removeHandler(socket: WebSocket) {
     try {
-      const findUser = await db.user.findMany({ where: { id: "userId" } });
+      const findUser = await db.user.findMany({
+        where: { id: "13233d5f-254a-4a4f-b52f-b4498bebab82" },
+      });
 
       if (!findUser)
         return socket.send(JSON.stringify({ message: "user not exist" }));
 
-      const leaveRoom = await db.roomUser.findMany({ where: { id: "userId" } });
+      const leaveRoom = await db.roomUser.delete({
+        where: { id: "13233d5f-254a-4a4f-b52f-b4498bebab82" },
+      });
 
+      console.log(`user leave the room ${leaveRoom.roomId}`);
       socket.send(
-        JSON.stringify({ message: `user has leave the room`, room: leaveRoom })
+        JSON.stringify({
+          message: `user leave the room ${leaveRoom.roomId}`,
+          room: leaveRoom,
+        })
       );
     } catch (err) {
       socket.close(4002, "unauthorized");
@@ -30,11 +38,10 @@ export class Room {
   }
 
   private addHandler(socket: WebSocket) {
-    //@ts-ignore
-    const userId = socket.userId;
     socket.on("message", async (data) => {
       try {
         const message = JSON.parse(data.toString());
+        console.log(message);
         if (message.type == JOIN_ROOM) {
           const { code, password } = message.payload || {};
 
@@ -73,7 +80,7 @@ export class Room {
               data: {
                 user: {
                   connect: {
-                    id: userId,
+                    id: "13233d5f-254a-4a4f-b52f-b4498bebab82",
                   },
                 },
                 roomId: findRoom.id,
@@ -107,6 +114,7 @@ export class Room {
         }
       } catch (err) {
         socket.close(4002);
+        console.log(err);
       }
     });
   }
