@@ -14,8 +14,8 @@ wss.on("connection", (socket) => {
   console.log("user connected");
 
   try {
-    chat.handleMessage(socket);
-    // room.joinRoom(socket);
+    // chat.handleMessage(socket);
+    room.joinRoom(socket);
 
     // joinedMembers.member(socket);
 

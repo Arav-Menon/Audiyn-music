@@ -19,14 +19,6 @@ class Message {
         if (parsedMessage.type == JOIN_ROOM) {
           console.log(`user Joined the room ${parsedMessage.payload.roomId}`);
 
-          await redisClient.HSET(
-            `room:${parsedMessage.payload.roomId}`,
-            socket,
-            JSON.stringify({
-              joinedAt: Date.now(),
-            })
-          );
-
           addToRoom.push({
             socket,
             room: parsedMessage.payload.roomId,

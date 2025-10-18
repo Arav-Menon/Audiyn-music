@@ -1,5 +1,10 @@
 import WebSocket from "ws";
 
+interface AddToRoom {
+  socket: WebSocket;
+  room: string;
+}
+
 export class MemoryStore {
   private activeUsers = new Map<string, WebSocket>();
   private roomMembers = new Map<string, Set<string>>();
