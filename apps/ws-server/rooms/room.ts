@@ -1,28 +1,30 @@
 import WebSocket from "ws";
 import { JOIN_ROOM, LEAVE_ROOM } from "../lib/messages";
 import { db } from "@repo/db/db";
-import { FileWatcherEventKind, WatchDirectoryFlags } from "typescript";
+import type { stringWidth } from "bun";
 
 export class Room {
   joinRoom(socket: WebSocket) {
+    console.log("user pass Authentication", socket.userId);
     this.addHandler(socket);
   }
   removeUser(socket: WebSocket) {
-    console.log("user leave the room");
     this.removeHandler(socket);
   }
 
   private async removeHandler(socket: WebSocket) {
+    console.log("user leave the room");
     try {
-      const findUser = await db.user.findMany({
-        where: { id: "13233d5f-254a-4a4f-b52f-b4498bebab82" },
+      const findUser = await db.user.findUnique({
+        //@ts-ignore
+        where: { userId: socket.userId },
       });
 
       if (!findUser)
         return socket.send(JSON.stringify({ message: "user not exist" }));
 
       const leaveRoom = await db.roomUser.delete({
-        where: { id: "13233d5f-254a-4a4f-b52f-b4498bebab82" },
+        where: { id: findUser.id },
       });
 
       console.log(`user leave the room ${leaveRoom.roomId}`);
@@ -80,7 +82,7 @@ export class Room {
               data: {
                 user: {
                   connect: {
-                    id: "13233d5f-254a-4a4f-b52f-b4498bebab82",
+                    id: socket.userId,
                   },
                 },
                 roomId: findRoom.id,
@@ -99,7 +101,7 @@ export class Room {
             data: {
               user: {
                 connect: {
-                  id: "13233d5f-254a-4a4f-b52f-b4498bebab82",
+                  id: socket.userId,
                 },
               },
               roomId: findRoom.id,
