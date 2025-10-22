@@ -14,4 +14,5 @@ const verifySocketConnection = (req: any) => {
   return decoded;
 };
 
-export default verifySocketConnection;
+export = verifySocketConnection;
+

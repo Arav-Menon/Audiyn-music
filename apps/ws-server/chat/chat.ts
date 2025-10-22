@@ -13,7 +13,7 @@ let addToRoom: Rooms[] = [];
 class Message {
   handleMessage(socket: any) {
     try {
-      socket.on("message", async (message: any) => {
+      socket.on("message", async (message: string) => {
         const parsedMessage = JSON.parse(message.toString());
 
         if (parsedMessage.type == JOIN_ROOM) {

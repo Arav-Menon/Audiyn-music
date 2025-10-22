@@ -1,7 +1,6 @@
 import WebSocket from "ws";
-import { JOIN_ROOM, LEAVE_ROOM } from "../lib/messages";
+import { JOIN_ROOM } from "../lib/messages";
 import { db } from "@repo/db/db";
-import type { stringWidth } from "bun";
 
 export class Room {
   joinRoom(socket: WebSocket) {
@@ -13,8 +12,7 @@ export class Room {
   }
 
   private async removeHandler(socket: WebSocket) {
-    console.log("user leave the room");
-    try {
+    socket.on("close", async () => {
       const findUser = await db.user.findUnique({
         //@ts-ignore
         where: { userId: socket.userId },
@@ -34,9 +32,7 @@ export class Room {
           room: leaveRoom,
         })
       );
-    } catch (err) {
-      socket.close(4002, "unauthorized");
-    }
+    });
   }
 
   private addHandler(socket: WebSocket) {
