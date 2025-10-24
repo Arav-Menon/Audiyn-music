@@ -21,35 +21,36 @@ model User {
 }
 
 model Streams {
-  id          String     @id @default(uuid())
-  type        StreamType
-  url         String
-  extractedId String
-  active      Boolean    @default(true)
-  upvotes     Upvotes[]
-  userId      String
-  user        User       @relation(fields: [userId], references: [id])
+  id           String     @id @default(uuid())
+  type         StreamType
+  videoId      String
+  songName     String
+  artistName   String
+  thumbnailUrl String
+  upvotes      Upvotes[]
+  userId       String
+  user         User       @relation(fields: [userId], references: [id])
 }
 
 model Upvotes {
-  id       String  @id @default(ulid())
-  userId   String
-  streamId String
-  user     User    @relation(fields: [userId], references: [id])
-  Streams  Streams @relation(fields: [streamId], references: [id])
+  id      String  @id @default(uuid())
+  userId  String
+  videoId String
+  user    User    @relation(fields: [userId], references: [id])
+  Streams Streams @relation(fields: [videoId], references: [id])
 
-  @@unique([userId, streamId])
+  @@unique([userId, videoId])
 }
 
 model Room {
-  id          String   @id @default(uuid())
-  name        String   @unique
-  code        String   @unique
-  isPrivate   Boolean  @default(false)
-  password    String?
-  adminId String
-  createdBy   User     @relation(fields: [adminId], references: [id])
-  createdAt   DateTime @default(now())
+  id        String   @id @default(uuid())
+  name      String   @unique
+  code      String   @unique
+  isPrivate Boolean  @default(false)
+  password  String?
+  adminId   String
+  createdBy User     @relation(fields: [adminId], references: [id])
+  createdAt DateTime @default(now())
 }
 
 model RoomUser {
@@ -63,8 +64,11 @@ model RoomUser {
 }
 
 enum StreamType {
-  Spotify
-  Youtube
+  VIDEO
+  SONG
+  PLAYLIST
+  ARTIST
+  ALBUM
 }
 
 enum Provider {
