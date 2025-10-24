@@ -27,9 +27,13 @@ model Streams {
   songName     String
   artistName   String
   thumbnailUrl String
+  roomId       String?
+  room         Room?      @relation(fields: [roomId], references: [id])
   upvotes      Upvotes[]
   userId       String
   user         User       @relation(fields: [userId], references: [id])
+
+  @@unique([videoId])
 }
 
 model Upvotes {
@@ -43,14 +47,15 @@ model Upvotes {
 }
 
 model Room {
-  id        String   @id @default(uuid())
-  name      String   @unique
-  code      String   @unique
-  isPrivate Boolean  @default(false)
+  id        String    @id @default(uuid())
+  name      String    @unique
+  code      String    @unique
+  isPrivate Boolean   @default(false)
   password  String?
   adminId   String
-  createdBy User     @relation(fields: [adminId], references: [id])
-  createdAt DateTime @default(now())
+  createdBy User      @relation(fields: [adminId], references: [id])
+  createdAt DateTime  @default(now())
+  streams   Streams[]
 }
 
 model RoomUser {
