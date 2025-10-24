@@ -7,7 +7,7 @@
     "@types/bun": "latest"
   },
   "scripts": {
-    "start:backend" : "bun server.ts" 
+    "start:backend": "bun server.ts"
   },
   "peerDependencies": {
     "typescript": "^5"
@@ -21,6 +21,9 @@
     "bcrypt": "^6.0.0",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
-    "jsonwebtoken": "^9.0.2"
+    "i": "^0.3.7",
+    "jsonwebtoken": "^9.0.2",
+    "npm": "^11.6.2",
+    "ytmusic-api": "^5.3.0"
   }
 }
