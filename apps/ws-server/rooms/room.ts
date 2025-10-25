@@ -1,6 +1,7 @@
-import WebSocket from "ws";
+import type { WebSocket } from "ws";
 import { JOIN_ROOM } from "../lib/messages";
 import { db } from "@repo/db/db";
+import { MusicHandler } from "../music/musicHandler";
 
 export class Room {
   joinRoom(socket: WebSocket) {
@@ -110,6 +111,8 @@ export class Room {
             })
           );
         }
+
+        MusicHandler.SearchSong(socket);
       } catch (err) {
         socket.close(4002);
         console.log(err);
