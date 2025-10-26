@@ -10,7 +10,7 @@ export class MusicHandler {
     this.ytmusic = new YTMusic();
   }
 
-  static SearchSong(socket: WebSocket, req: any) {
+  static SearchSong(socket: WebSocket) {
     console.log("Request is comming here");
     socket.on("message", async (data) => {
       try {
