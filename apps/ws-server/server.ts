@@ -1,12 +1,15 @@
 import { WebSocketServer } from "ws";
 import { Room } from "./rooms/room";
 import verifySocketConnection from "./verification";
+import { MusicHandler } from "./music/musicHandler";
 
 const PORT = Number(process.env.PORT);
 
 const wss = new WebSocketServer({ port: PORT });
 
 const room = new Room();
+
+await MusicHandler.initialize();
 
 wss.on("connection", (socket, req) => {
   console.log("user connected");
@@ -16,7 +19,6 @@ wss.on("connection", (socket, req) => {
 
     console.log(user);
 
-    //@ts-ignore
     socket.userId = user.id;
     room.joinRoom(socket);
 
