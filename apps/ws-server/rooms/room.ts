@@ -112,7 +112,7 @@ export class Room {
           );
         }
 
-      MusicHandler.SearchSong(socket);
+        MusicHandler.SearchSong(socket);
       } catch (err) {
         socket.close(4002);
         console.log(err);
