@@ -1,4 +1,4 @@
-import jwt from "jsonwebtoken";
+const jwt = require("jsonwebtoken");
 
 const verifySocketConnection = (req: any) => {
   const token = req.headers["authorization"];
@@ -15,4 +15,3 @@ const verifySocketConnection = (req: any) => {
 };
 
 export = verifySocketConnection;
-
