@@ -4,7 +4,6 @@ import { createRoomRouter } from "./routes/room/controllers/room.create";
 import { deleteRoomRouter } from "./routes/room/controllers/room.delete";
 import { updateUserRouter } from "./routes/user/auth/update.user";
 import { userProfileRouter } from "./routes/user/auth/user";
-import { musicApi } from "./routes/music-api/music";
 
 const PORT = process.env.PORT;
 console.log(PORT);
@@ -20,9 +19,6 @@ app.use("/user", userRouter);
 // room
 app.use("/room", createRoomRouter);
 app.use("/room", deleteRoomRouter);
-
-// music
-app.use("/music", musicApi);
 
 app.listen(PORT, () => {
   console.log(`Server is running on PORT ${PORT}`);
