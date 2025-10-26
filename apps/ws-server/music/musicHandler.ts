@@ -12,6 +12,7 @@ export class MusicHandler {
   }
 
   static SearchSong(socket: WebSocket) {
+    console.log("Request is comming here");
     socket.on("message", async (data) => {
       try {
         const message = JSON.parse(data.toString());
@@ -21,7 +22,9 @@ export class MusicHandler {
 
           if (!songName || !roomId) return socket.send("Payload is missing");
 
-          const result = await this.ytmusic.searchSongs(songName);
+          const result = await this.ytmusic.search(songName);
+
+          console.log(result);
 
           const song = result.find((item) => item.type === "SONG");
 
@@ -50,6 +53,8 @@ export class MusicHandler {
             create: data as any,
           });
 
+          if (!savedStream) return socket.close(4002, "Something got wrong");
+
           socket.send(
             JSON.stringify({
               message: "Song stored successfully",
@@ -64,5 +69,3 @@ export class MusicHandler {
     });
   }
 }
-
-export const musicHandler = new MusicHandler();
