@@ -37,13 +37,14 @@ model Streams {
 }
 
 model Upvotes {
-  id      String  @id @default(uuid())
-  userId  String
-  videoId String
-  user    User    @relation(fields: [userId], references: [id])
-  Streams Streams @relation(fields: [videoId], references: [id])
+  id       String  @id @default(uuid())
+  userId   String
+  videoId  String
+  user     User    @relation(fields: [userId], references: [id])
+  streamId String
+  stream   Streams @relation(fields: [streamId], references: [id]) // Changed from videoId to streamId
 
-  @@unique([userId, videoId])
+  @@unique([userId, videoId], map: "userId_videoId")
 }
 
 model Room {
