@@ -22,7 +22,9 @@ wss.on("connection", (socket, req) => {
     socket.userId = user.id;
     room.joinRoom(socket);
 
-    socket.on("close", () => room.removeUser(socket));
+    socket.on("close", async () => {
+      await room.removeUser(socket);
+    });
   } catch (err) {
     console.log(err);
     socket.send(JSON.stringify({ type: "Error", message: err }));
