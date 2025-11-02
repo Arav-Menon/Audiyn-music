@@ -5,6 +5,11 @@
   --font-space-grotesk: 'Space Grotesk', sans-serif;
 }
 
+::selection {
+  font-weight: 600;
+  color: white
+}
+
 body {
   font-family: var(--font-space-grotesk);
   background-color: #0E0E0C;
