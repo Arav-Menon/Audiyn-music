@@ -44,7 +44,7 @@ export default function Navbar() {
                   <Button
                     key={index}
                     variant={"destructive"}
-                    className="border border-gray-200"
+                    className="border border-gray-200 hover:cursor-pointer hover:scale-105"
                     size={"lg"}
                     onClick={() => router.push(link.href)}
                   >
