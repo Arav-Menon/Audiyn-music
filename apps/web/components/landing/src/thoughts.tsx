@@ -1,3 +1,4 @@
+"use client"
 import { Music } from "lucide-react";
 
 export default function Thoughts() {
