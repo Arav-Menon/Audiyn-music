@@ -30,14 +30,14 @@ export default function Header() {
               <Button
                 size="lg"
                 variant="outline"
-                className="border-slate-400 text-white hover:bg-slate-950 cursor-pointer bg-transparent"
+                className="border-slate-400 text-white hover:bg-white/5 cursor-pointer bg-transparent"
               >
                 Join Room
               </Button>
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-4 pt-8 border-t border-slate-700">
+            <div className="grid grid-cols-3 gap-4 pt-8 border-t border-white/20">
               <div>
                 <p className="text-white/80 text-2xl font-bold">10K+</p>
                 <p className="text-slate-400 text-sm">Active Users</p>
@@ -68,7 +68,7 @@ export default function Header() {
               {/* Leaderboard Items */}
               <div className="space-y-3">
                 {/* Rank 1 */}
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-primary hover:bg-slate-700 transition border border-slate-600">
+                <div className="flex items-center gap-3 p-3 rounded-lg bg-primary hover:bg-white/5 transition border border-white/10">
                   <div className="text-lg font-bold text-white w-6">1</div>
                   <div className="flex-1">
                     <p className="font-semibold text-sm text-white/79 ">
@@ -83,7 +83,7 @@ export default function Header() {
                 </div>
 
                 {/* Rank 2 */}
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-primary hover:bg-gray-900 transition">
+                <div className="flex items-center gap-3 p-3 rounded-lg bg-primary hover:bg-white/5 transition">
                   <div className="text-lg font-bold text-white/79 w-6">2</div>
                   <div className="flex-1">
                     <p className="font-semibold text-sm text-white/79 ">
@@ -98,7 +98,7 @@ export default function Header() {
                 </div>
 
                 {/* Rank 3 */}
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-primary hover:bg-gray-900 transition">
+                <div className="flex items-center gap-3 p-3 rounded-lg bg-primary hover:bg-white/5 transition">
                   <div className="text-lg font-bold text-slate-400 w-6">3</div>
                   <div className="flex-1">
                     <p className="font-semibold text-sm text-white/79">
@@ -113,7 +113,7 @@ export default function Header() {
                 </div>
 
                 {/* Rank 4 */}
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-primary hover:bg-gray-900 transition">
+                <div className="flex items-center gap-3 p-3 rounded-lg bg-primary hover:bg-white/5 transition">
                   <div className="text-lg font-bold text-slate-400 w-6">4</div>
                   <div className="flex-1">
                     <p className="font-semibold text-sm text-white/79">
@@ -128,7 +128,7 @@ export default function Header() {
                 </div>
 
                 {/* Rank 5 */}
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-primary hover:bg-gray-900 transition">
+                <div className="flex items-center gap-3 p-3 rounded-lg bg-primary hover:bg-white/5 transition">
                   <div className="text-lg font-bold text-slate-400 w-6">5</div>
                   <div className="flex-1">
                     <p className="font-semibold text-sm text-white/79">
