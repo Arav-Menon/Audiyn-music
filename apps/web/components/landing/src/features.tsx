@@ -5,14 +5,14 @@ import { Lock, Music, TrendingUp, Users } from "lucide-react";
 export default function Feature() {
   return (
     <>
-      <div className="max-w-7xl mx-auto px-4 py-24 border-t border-slate-700">
+      <div className="max-w-7xl mx-auto px-4 py-24 border-t border-white/20">
         <div className="space-y-12">
           {/* Section Header */}
           <div className="text-center space-y-4">
             <span className="text-white/79 text-sm py-2 px-4  font-semibold uppercase tracking-widest border border-[0.5] shadow-inner shadow-gray-400 rounded-3xl">
               Our Features
             </span>
-            <h2 className="text-4xl md:text-5xl mt-7 font-bold text-white">
+            <h2 className="text-4xl md:text-5xl mt-7 font-bold bg-clip-text text-transparent bg-gradient-to-b from-neutral-200 to-neutral-500">
               Powerful Voting Features
             </h2>
             <p className="text-slate-400 max-w-2xl mx-auto">
@@ -41,7 +41,7 @@ export default function Feature() {
                 momentum as your community votes in real-time across your voting
                 room.
               </p>
-              <div className="h-24 bg-slate-700/20 rounded-lg border border-slate-700/50"></div>
+              <div className="h-24 bg-white/5 rounded-lg border border-slate-700/50"></div>
             </div>
 
             {/* Feature 2: Community Control */}
@@ -61,7 +61,7 @@ export default function Feature() {
                 democratic voting rooms where every vote counts equally and
                 voices are heard.
               </p>
-              <div className="h-24 bg-slate-700/20 rounded-lg border border-slate-700/50"></div>
+              <div className="h-24 bg-white/5 rounded-lg border border-slate-700/50"></div>
             </div>
 
             {/* Feature 3: Multi-Genre Support */}
@@ -81,7 +81,7 @@ export default function Feature() {
                 and discover new music that matches your community's mood and
                 preferences.
               </p>
-              <div className="h-24 bg-slate-700/20 rounded-lg border border-slate-700/50"></div>
+              <div className="h-24 bg-white/5 rounded-lg border border-slate-700/50"></div>
             </div>
 
             {/* Feature 4: Secure Voting */}
@@ -101,7 +101,7 @@ export default function Feature() {
                 vote is counted accurately and your community's choices are
                 protected from manipulation.
               </p>
-              <div className="h-24 bg-slate-700/20 rounded-lg border border-slate-700/50"></div>
+              <div className="h-24 bg-white/5 rounded-lg border border-slate-700/50"></div>
             </div>
           </div>
         </div>
