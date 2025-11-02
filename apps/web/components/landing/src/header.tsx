@@ -56,7 +56,7 @@ export default function Header() {
           {/* Right - Now Playing Card */}
           {/* Right - Trending Songs Leaderboard */}
           <div className="flex justify-center">
-            <div className="w-full max-w-sm bg-transparent backdrop-blur-xl border border-slate-700 rounded-2xl p-6 space-y-6">
+            <div className="w-full max-w-sm bg-transparent backdrop-blur-xl border border-white/20 rounded-2xl p-6 space-y-6">
               {/* Header */}
               <div className="space-y-2">
                 <h3 className="text-xl font-bold text-white">
@@ -144,7 +144,7 @@ export default function Header() {
               </div>
 
               {/* View All Button */}
-              <Button className="w-full bg-white/90 hover:bg-emerald-600 text-black font-semibold">
+              <Button className="w-full bg-white/80 hover:bg-white text-black font-semibold">
                 View Full Leaderboard →
               </Button>
             </div>
