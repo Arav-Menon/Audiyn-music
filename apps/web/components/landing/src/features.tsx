@@ -1,5 +1,4 @@
 "use client";
-import { Button } from "@/components/ui/button";
 import { Lock, Music, TrendingUp, Users } from "lucide-react";
 
 export default function Feature() {
