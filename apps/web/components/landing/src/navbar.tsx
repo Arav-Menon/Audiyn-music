@@ -29,7 +29,7 @@ export default function Navbar() {
       <div className="flex justify-between items-center px-4 md:px-8 py-4 backdrop-blur-xl relative">
         {/* Logo */}
         <div className="flex items-center gap-2">
-          <img src="./audiyn.png" height={55} width={55} alt="audiyn" />
+          <img src="./audiyn.png" className="h-16 w-16" alt="audiyn" />
           <h3 className="text-2xl text-[#fff]">Audiyn</h3>
         </div>
 
@@ -38,7 +38,11 @@ export default function Navbar() {
           <div className="flex gap-4">
             {navContent.map((link, index) => {
               return (
-                <Link key={index} href={link.href} className="text-gray-300 hover:text-white transition-colors">
+                <Link
+                  key={index}
+                  href={link.href}
+                  className="text-gray-300 hover:text-white transition-colors"
+                >
                   {link.name}
                 </Link>
               );
