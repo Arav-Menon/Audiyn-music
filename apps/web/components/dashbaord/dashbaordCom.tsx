@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Users, Search, Plus, DoorOpen, Menu, X } from "lucide-react";
-import { Sidebar } from "./sidebar";
+import { Users, Search, Plus, DoorOpen, Menu } from "lucide-react";
+import Sidebar from "./sidebar";
 
-// Room Card Component
 function RoomCard({
   room,
   index,
@@ -16,11 +15,6 @@ function RoomCard({
   getDisplayCount,
   variant = "default",
 }: any) {
-  const gradientClass =
-    variant === "community"
-      ? "from-cyan-600 to-purple-500"
-      : "from-purple-600 to-cyan-500";
-
   const shadowColor = variant === "community" ? "cyan" : "purple";
 
   return (
@@ -48,8 +42,12 @@ function RoomCard({
         </span>
       </div>
 
-      <h3 className="text-base sm:text-lg font-bold mb-1 sm:mb-2 truncate">{room.name}</h3>
-      <p className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4 truncate">Host: {room.host}</p>
+      <h3 className="text-base sm:text-lg font-bold mb-1 sm:mb-2 truncate">
+        {room.name}
+      </h3>
+      <p className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4 truncate">
+        Host: {room.host}
+      </p>
 
       <div className="flex items-center gap-2 text-xs sm:text-sm mb-3 sm:mb-4">
         <Users className="w-3 h-3 sm:w-4 sm:h-4 text-accent flex-shrink-0" />
@@ -81,20 +79,6 @@ export default function DashboardComp() {
   const [animatedCounts, setAnimatedCounts] = useState<Record<number, number>>(
     {}
   );
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 1024) {
-        setSidebarOpen(true);
-      } else {
-        setSidebarOpen(false);
-      }
-    };
-    
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   const rooms = [
     {
@@ -211,14 +195,14 @@ export default function DashboardComp() {
 
   return (
     <div className="flex h-screen bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.15)_0%,transparent_70%)] text-white/80 overflow-hidden">
-      {/* Mobile Overlay */}
+      {/* Mobile Overlay - only shows on mobile when sidebar is open */}
       {sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
-      
+
       <Sidebar
         isOpen={sidebarOpen}
         onToggle={() => setSidebarOpen(!sidebarOpen)}
@@ -231,11 +215,7 @@ export default function DashboardComp() {
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="p-2 hover:bg-secondary/20 rounded-lg transition-all duration-200"
           >
-            {sidebarOpen ? (
-              <X className="w-5 h-5" />
-            ) : (
-              <Menu className="w-5 h-5" />
-            )}
+            <Menu className="w-5 h-5" />
           </button>
 
           <div className="flex-1 max-w-md mx-2 sm:mx-4">
@@ -265,7 +245,9 @@ export default function DashboardComp() {
               <span className="hidden md:inline">Join Room</span>
             </Button>
             <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/40 flex items-center justify-center cursor-pointer hover:bg-white/30 transition-all duration-200">
-              <span className="text-white font-semibold text-sm sm:text-base">A</span>
+              <span className="text-white font-semibold text-sm sm:text-base">
+                A
+              </span>
             </div>
           </div>
         </nav>
@@ -303,7 +285,9 @@ export default function DashboardComp() {
             {/* Most Joined Rooms */}
             <section className="space-y-4 sm:space-y-6">
               <div>
-                <h2 className="text-2xl sm:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-neutral-200 to-neutral-500">Most Joined Rooms</h2>
+                <h2 className="text-2xl sm:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-neutral-200 to-neutral-500">
+                  Most Joined Rooms
+                </h2>
                 <p className="text-muted-foreground mt-1 text-sm sm:text-base">
                   Experience the most active music communities
                 </p>
