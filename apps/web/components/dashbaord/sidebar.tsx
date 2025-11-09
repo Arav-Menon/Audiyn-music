@@ -42,7 +42,7 @@ export default function Sidebar({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center">
-              <Music className="w-6 h-6 text-white" />
+              <img src="./audiyn.png" alt="" />
             </div>
             <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-neutral-200 to-neutral-500">
               Audiyn
