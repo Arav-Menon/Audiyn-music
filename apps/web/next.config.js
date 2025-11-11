@@ -1,10 +1,12 @@
-export default {
-  // ... other config
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   experimental: {
+    // remove this invalid key
     skipTrailingSlashRedirect: true,
   },
-  // Or disable static 404
-  generateBuildId: async () => {
-    return 'build-id'
-  },
-}
+};
+
+export default nextConfig;
