@@ -10,6 +10,11 @@
   color: white
 }
 
+::-webkit-scrollbar {
+  display: none;
+  /* Hides the scrollbar */
+}
+
 body {
   font-family: var(--font-space-grotesk);
   background-color: #0E0E0C;
