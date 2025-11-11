@@ -1,12 +1,12 @@
-/** @type {import('next').NextConfig} */
 const nextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
+  eslint: { ignoreDuringBuilds: true },
+  skipTrailingSlashRedirect: true,
+  output: 'standalone',
+  // This prevents 404/_error pre-render issues
   experimental: {
-    // remove this invalid key
-    skipTrailingSlashRedirect: true,
+    typedRoutes: false,
   },
+  reactStrictMode: false,
 };
 
 export default nextConfig;
