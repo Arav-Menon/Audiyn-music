@@ -7,6 +7,9 @@ import {
   HelpCircle,
   LogOut,
 } from "lucide-react";
+import Cookies from "js-cookie";
+import { TLSSocket } from "tls";
+import { useRouter } from "next/navigation";
 
 export default function Sidebar({
   isOpen,
@@ -15,6 +18,7 @@ export default function Sidebar({
   isOpen: boolean;
   onToggle: () => void;
 }) {
+  const router = useRouter();
   const navItems = [
     { icon: Music, label: "Dashboard", active: true },
     { icon: Users, label: "My Rooms", active: false },
@@ -23,9 +27,14 @@ export default function Sidebar({
   ];
 
   const footerItems = [
-    { icon: HelpCircle, label: "Help" },
+    { icon: HelpCircle, label: "help" },
     { icon: LogOut, label: "Logout" },
   ];
+
+  const onHandleClick = () => {
+    Cookies.remove("token");
+    router.push("/");
+  };
 
   return (
     <aside
@@ -79,6 +88,7 @@ export default function Sidebar({
           <button
             key={i}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sidebar-foreground hover:bg-white/5 transition-all duration-200"
+            onClick={onHandleClick}
           >
             <item.icon className="w-5 h-5" />
             <span>{item.label}</span>
