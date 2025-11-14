@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./apps/docs/public/logo.png" width="120" alt="Audiyn Logo" />
+  <img src="./apps/web/public/audiyn.png" width="120" alt="Audiyn Logo" />
 </p>
 
 <h1 align="center">🎧 Audiyn Music</h1>
@@ -24,7 +24,7 @@
 ## 🖼️ UI Preview
 
 <p align="center">
-  <img src="./apps/docs/public/Room_dashboard.png" width="90%" alt="Audiyn Dashboard Preview" />
+  <img src="./apps/web/public/Room_dashboard.png" width="90%" alt="Audiyn Dashboard Preview" />
 </p>
 
 ---
