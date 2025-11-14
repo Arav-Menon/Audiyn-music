@@ -8,6 +8,7 @@ import { Lock, User, Mail, MoveLeft, ChevronLeft } from "lucide-react";
 import { Button } from "../ui/button";
 import { signin } from "@/utils/api";
 import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -18,7 +19,12 @@ export default function LoginPage() {
   const onHandlerClick = async () => {
     const token = await signin(email, password);
     console.log(token);
-    localStorage.setItem("token", token);
+
+    Cookies.set("token", token, {
+      expires: 7,
+      path: "/",
+    });
+
     router.push("/dashboard");
   };
 
