@@ -6,21 +6,20 @@ import { useState } from "react";
 import Link from "next/link";
 import { Lock, User, Mail, MoveLeft, ChevronLeft } from "lucide-react";
 import { Button } from "../ui/button";
+import { signin } from "@/utils/api";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
-  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsLoading(false);
+  const onHandlerClick = async () => {
+    const token = await signin(email, password);
+    console.log(token);
+    localStorage.setItem("token", token);
+    router.push("/dashboard");
   };
 
   return (
@@ -32,7 +31,6 @@ export default function LoginPage() {
           <div className="absolute top-0 left-0 w-96 h-96 bg-white/30 rounded-full mix-blend-multiply filter blur-3xl" />
           <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/30 rounded-full mix-blend-multiply filter blur-3xl" />
         </div>
-
 
         {/* Content */}
         <div className="relative z-10 text-center px-8 animate-fade-in">
@@ -67,7 +65,7 @@ export default function LoginPage() {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-6">
             {/* Username Input */}
 
             {/* Email Input */}
@@ -87,7 +85,6 @@ export default function LoginPage() {
             <div className="relative">
               <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#d3d3d3]" />
               <input
-                type={showPassword ? "text" : "password"}
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -112,11 +109,12 @@ export default function LoginPage() {
             <Button
               type="submit"
               disabled={isLoading}
+              onClick={onHandlerClick}
               className="w-full border border-white/15 text-white py-3 bg-white/5 font-semibold hover:bg-white/90 hover:text-black transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider mt-8"
             >
               {isLoading ? "Creating Account..." : "LOG IN"}
             </Button>
-          </form>
+          </div>
 
           {/* Login Link */}
           <div className="mt-8 text-center">
