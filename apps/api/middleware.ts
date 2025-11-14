@@ -1,15 +1,9 @@
 import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import "dotenv/config";
+process.env.AUTH_TOKEN;
 
-const sf = process.env.AUTH_TOKEN;
-console.log(sf);
-
-export function middleware(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
+export function middleware(req: Request, res: Response, next: NextFunction) {
   try {
     const token = req.headers["authorization"];
 
