@@ -4,11 +4,19 @@ import { createRoomRouter } from "./routes/room/controllers/room.create";
 import { deleteRoomRouter } from "./routes/room/controllers/room.delete";
 import { updateUserRouter } from "./routes/user/auth/update.user";
 import { userProfileRouter } from "./routes/user/auth/user";
+import cors from "cors";
 
 const PORT = process.env.PORT;
 console.log(PORT);
 const app = express();
 app.use(express.json());
+
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
 
 // user
 app.use("/user", userRouter);
