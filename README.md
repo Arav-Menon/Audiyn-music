@@ -2,7 +2,7 @@
   <img src="./apps/web/public/audiyn.png" width="120" alt="Audiyn Logo" />
 </p>
 
-<h1 align="center">🎧 Audiyn Music</h1>
+<h1 align="center">Audiyn Music</h1>
 
 <p align="center">
   A collaborative music platform where everyone decides what plays next.  
