@@ -24,7 +24,7 @@
 ## 🖼️ UI Preview
 
 <p align="center">
-  <img src="./apps/web/public/Room_dashboard.png" width="90%" alt="Audiyn Dashboard Preview" />
+  <img src="./apps/web/public/room.png" width="90%" alt="Audiyn Dashboard Preview" />
 </p>
 
 ---
