@@ -4,6 +4,10 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Users, Search, Plus, DoorOpen, Menu } from "lucide-react";
 import Sidebar from "./sidebar";
+import OpenAudyinButton from "./open-vibe";
+import AudiyinModal from "./roomModel";
+import ModalWrapper from "./modalWrapper";
+import RoomModal from "./roomModel";
 
 function RoomCard({
   room,
@@ -16,6 +20,8 @@ function RoomCard({
   variant = "default",
 }: any) {
   const shadowColor = variant === "community" ? "cyan" : "purple";
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <div
@@ -79,6 +85,7 @@ export default function DashboardComp() {
   const [animatedCounts, setAnimatedCounts] = useState<Record<number, number>>(
     {}
   );
+  const [open, setOpen] = useState(false);
 
   const rooms = [
     {
@@ -229,11 +236,32 @@ export default function DashboardComp() {
             </div>
           </div>
 
+          {/* <div className="flex items-center justify-center bg-black">
+            <button
+              onClick={() => setOpen(true)}
+              className="px-6 py-3 bg-white/10 text-white rounded-xl hover:bg-white/20"
+            >
+              Open Room Portal
+            </button>
+
+            {open && (
+              <div className="fixed inset-0 bg-black/60 backdrop-blur-xl flex items-center justify-center">
+                <RoomModal onClose={() => setOpen(false)} />
+              </div>
+            )}
+          </div> */}
+
           <div className="flex items-center gap-2 sm:gap-3">
-            <Button className="bg-white/5 hover:shadow-lg text-white gap-2 transition-all duration-200 hover:bg-white/15 hidden sm:flex">
-              <Plus className="w-4 h-4" />
-              <span className="hidden md:inline">Create Room</span>
-            </Button>
+            {/* {isOpen ? (
+              <AudiyinModal onClose={() => setIsOpen(false)} />
+            ) : (
+              <Button
+                onClick={() => setIsOpen(true)}
+                className="bg-white/70 text-slate-950 hover:bg-white hover:shadow-lg hover:shadow-white/20 font-semibold transition-all duration-200"
+              >
+                Join the vibe
+              </Button>
+            )} */}
             <Button className="bg-white/5 hover:shadow-lg text-white transition-all duration-200 hover:bg-white/15 sm:hidden p-2">
               <Plus className="w-5 h-5" />
             </Button>
@@ -242,7 +270,7 @@ export default function DashboardComp() {
               className="border-white/20 text-accent hover:bg-accent/10 gap-2 bg-transparent transition-all duration-200 hidden sm:flex"
             >
               <DoorOpen className="w-4 h-4" />
-              <span className="hidden md:inline">Join Room</span>
+              <span className=" md:inline">Join the vibe</span>
             </Button>
             <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/40 flex items-center justify-center cursor-pointer hover:bg-white/30 transition-all duration-200">
               <span className="text-white font-semibold text-sm sm:text-base">
