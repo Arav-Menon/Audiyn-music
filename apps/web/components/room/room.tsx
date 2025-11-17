@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { getRoom } from "@/utils/join_room_api/api";
+import { useParams } from "next/navigation";
 
 interface Message {
   id: string;
@@ -192,6 +194,27 @@ export default function RoomPage() {
     setSearchQuery("");
     setShowSearchResults(false);
   };
+  // Fetch and set the room name for the user
+  const { roomId } = useParams();
+  const [roomName, setRoomName] = useState("");
+  const [host, setHost] = useState("");
+
+  useEffect(() => {
+    const fetchRoom = async () => {
+      try {
+        const response = await getRoom(roomId as string);
+
+        // backend structure ke hisaab se adjust
+        setRoomName(response.room.name);
+        setHost(response.admin.username);
+      } catch (err) {
+        console.log("Fetch error:", err);
+        setRoomName("Unknown Room");
+      }
+    };
+
+    fetchRoom();
+  }, [roomId]);
 
   return (
     <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.15)_0%,transparent_70%)] text-white">
@@ -199,13 +222,9 @@ export default function RoomPage() {
       <div className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md border-b border-gray-800">
         <div className="px-3 md:px-6 py-3 md:py-4 flex items-center justify-between">
           <div className="flex items-center gap-2 md:gap-4">
-            <img
-              src="/audiyn.png"
-              className="h-8 w-8 md:h-12 md:w-12"
-              alt=""
-            />
+            <img src="/audiyn.png" className="h-8 w-8 md:h-12 md:w-12" alt="" />
             <span className="sm:inline">/</span>
-            <h2 className="text-sm md:text-base">VibeCore</h2>
+            <h2 className="text-sm md:text-base">{roomName}</h2>
             <div className="hidden sm:block h-6 w-px bg-gray-700" />
             <div className="hidden md:flex items-center gap-2 text-sm text-gray-400">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
@@ -214,7 +233,7 @@ export default function RoomPage() {
           </div>
           <div className="flex items-center gap-2 md:gap-3">
             <div className="px-2 md:px-4 py-1 md:py-2 rounded-lg flex bg-white/20 items-center justify-center">
-              <span className="text-xs md:text-base">Host: @cyvox</span>
+              <span className="text-xs md:text-base">Host: {host}</span>
             </div>
             <Button
               variant="destructive"
