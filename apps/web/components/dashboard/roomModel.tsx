@@ -1,8 +1,9 @@
 "use client";
 
+import { SOCKET_URL } from "@/utils/api_url";
 import { createRoom } from "@/utils/join_room_api/api";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function RoomModal() {
   const [mode, setMode] = useState<"create" | "join">("create");
@@ -11,6 +12,7 @@ export default function RoomModal() {
   const [isPrivate, setIsPrivate] = useState(false);
   const [password, setPassword] = useState("");
   const router = useRouter();
+  const wsRef = useRef<WebSocket | null>(null);
 
   const onHandleClick = async () => {
     const response = await createRoom(name, code, isPrivate, password);
@@ -18,7 +20,22 @@ export default function RoomModal() {
     if (!response) {
       console.log("something went wrong");
     }
+
     return router.push(`/r/${response}`);
+  };
+
+  const onHandlerWsClick = () => {
+      const ws = new WebSocket(SOCKET_URL);
+      wsRef.current = ws;
+
+      ws.onopen = () => {
+        ws.send(
+          JSON.stringify({
+            type: "JOIN_ROOM",
+            payload: { code: code, password: password ?? null },
+          })
+        );
+      };
   };
 
   return (
@@ -109,6 +126,7 @@ export default function RoomModal() {
             <input
               placeholder="Enter code"
               className="w-full mt-1 bg-white/10 border border-white/10 rounded-xl px-4 py-2 text-sm outline-none focus:border-white/20"
+              onChange={(e) => setCode(e.target.value)}
             />
           </div>
 
@@ -117,6 +135,7 @@ export default function RoomModal() {
             <input
               placeholder="Optional"
               className="w-full mt-1 bg-white/10 border border-white/10 rounded-xl px-4 py-2 text-sm outline-none focus:border-white/20"
+              onChange={(e) => setPassword(e.target.value)}
             />
           </div>
         </div>
@@ -125,7 +144,7 @@ export default function RoomModal() {
       {/* Bottom Button */}
       <button
         className="w-full mt-8 bg-white/20 hover:bg-white/30 transition rounded-xl py-3 text-sm"
-        onClick={onHandleClick}
+        onClick={onHandlerWsClick}
       >
         Tune In
       </button>
