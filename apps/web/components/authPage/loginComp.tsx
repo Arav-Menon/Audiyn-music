@@ -20,6 +20,8 @@ export default function LoginPage() {
     const token = await signin(email, password);
     console.log(token);
 
+    localStorage.setItem("token", token);
+
     Cookies.set("token", token, {
       expires: 7,
       path: "/",
