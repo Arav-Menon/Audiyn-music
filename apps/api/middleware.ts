@@ -5,10 +5,14 @@ process.env.AUTH_TOKEN;
 
 export function middleware(req: Request, res: Response, next: NextFunction) {
   try {
-    const token = req.headers["authorization"];
+    let token = req.headers["authorization"];
+
+    if (!token && req.cookies && req.cookies.token) {
+      token = req.cookies.token;
+    }
 
     if (!token) {
-      return res.status(401).json({ error: "No token, authorization denied" });
+      return res.status(401).json({ error: "No token provided" });
     }
 
     const decoded = jwt.verify(token, process.env.AUTH_TOKEN!) as {
