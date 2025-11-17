@@ -10,6 +10,19 @@ const axiosInstence = axios.create({
   },
 });
 
+export const register = async (
+  username: string,
+  email: string,
+  password: string
+) => {
+  const response = await axiosInstence.post("/user/auth", {
+    username,
+    email,
+    password,
+  });
+  return response.data.token;
+};
+
 export const signin = async (email: string, password: string) => {
   const response = await axiosInstence.post("/user/auth", {
     email,
