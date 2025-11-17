@@ -6,7 +6,7 @@ export function middleware(request: any) {
   const url = request.nextUrl.pathname;
 
   // Protect dashboard
-  if (url.startsWith("/dashboard")) {
+  if (url.startsWith("/dashboard") || url.startsWith("/r") || url.startsWith("join-the-vibe") ) {
     if (!token) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
@@ -16,5 +16,5 @@ export function middleware(request: any) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*"],
+  matcher: ["/dashboard/:path*", "/r/:path*"],
 };
