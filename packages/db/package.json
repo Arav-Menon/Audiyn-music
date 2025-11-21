@@ -4,9 +4,9 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "generate": "bunx prisma generate",
-    "studio": "bunx prisma studio",
-    "migrate": "bunx prisma migrate dev "
+    "generate": "npx prisma generate",
+    "studio": "npx prisma studio",
+    "migrate": "npx prisma migrate dev "
   },
   "exports": {
     "./db": "./index.ts"
