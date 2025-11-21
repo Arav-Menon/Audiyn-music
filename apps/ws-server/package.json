@@ -3,7 +3,7 @@
   "module": "index.ts",
   "type": "module",
   "scripts": {
-    "start:ws": "bun server.ts"
+    "start:ws": "yarn server.ts"
   },
   "private": true,
   "devDependencies": {
