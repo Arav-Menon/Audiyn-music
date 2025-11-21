@@ -1,0 +1,16 @@
+FROM oven/bun
+
+WORKDIR /usr/src/app
+
+# Copy only API folder + shared packages it needs
+COPY apps/api ./apps/api
+COPY packages/db ./packages/db
+
+WORKDIR /usr/src/app/apps/api
+
+RUN bun install
+
+RUN bunx prisma generate --schema ../../packages/db/prisma/schema.prisma
+
+EXPOSE 3001
+CMD ["bun", "start:ws"]
