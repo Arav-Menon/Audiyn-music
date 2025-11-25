@@ -1,5 +1,5 @@
 import type { WebSocket } from "ws";
-import { JOIN_ROOM } from "../lib/messages";
+import { JOIN_ROOM, LEAVE_ROOM } from "../lib/messages";
 import { db } from "@repo/db/db";
 import { MusicHandler } from "../music/musicHandler";
 import { voting } from "../voting/voting";
@@ -11,6 +11,10 @@ export class Room {
   }
   removeUser(socket: WebSocket) {
     this.removeHandler(socket);
+  }
+
+  leaveRoom(socket: WebSocket) {
+    this.leaveHandler(socket);
   }
 
   private async removeHandler(socket: WebSocket) {
@@ -54,6 +58,63 @@ export class Room {
         })
       );
     }
+  }
+
+  private async leaveHandler(socket: WebSocket) {
+    socket.on("message", async (data) => {
+      if (!socket.userId) return;
+      const message = JSON.parse(data.toString());
+
+      if (message.type == LEAVE_ROOM) {
+        const { roomId } = message.payload || {};
+
+        if (!roomId)
+          return socket.send(
+            JSON.stringify({
+              type: "Error",
+              message: "Missing roomId or userId",
+            })
+          );
+
+        const findUser = await db.user.findUnique({
+          where: { id: socket.userId },
+        });
+
+        if (!findUser)
+          return socket.send(
+            JSON.stringify({
+              type: "Error",
+              message: "Can't find user",
+            })
+          );
+
+        const findRoom = await db.roomUser.findUnique({
+          where: {
+            id: roomId,
+          },
+        });
+
+        if (!findRoom)
+          return socket.send(
+            JSON.stringify({
+              type: "Error",
+              message: "can't find the room to leave",
+            })
+          );
+
+        await db.roomUser.delete({
+          where: {
+            id: roomId,
+          },
+        });
+
+        socket.send(
+          JSON.stringify({
+            message: "room  leave successfully",
+          })
+        );
+      }
+    });
   }
 
   private addHandler(socket: WebSocket) {
