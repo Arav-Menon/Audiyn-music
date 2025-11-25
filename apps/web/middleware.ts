@@ -6,7 +6,12 @@ export function middleware(request: any) {
   const url = request.nextUrl.pathname;
 
   // Protect dashboard
-  if (url.startsWith("/dashboard") || url.startsWith("/r") || url.startsWith("join-the-vibe") ) {
+  if (
+    url.startsWith("/dashboard") ||
+    url.startsWith("/r") ||
+    url.startsWith("/join-the-vibe") ||
+    url.startsWith("/create-the-vibe")
+  ) {
     if (!token) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
