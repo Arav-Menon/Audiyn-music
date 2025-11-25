@@ -5,9 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Users, Search, Plus, DoorOpen, Menu } from "lucide-react";
 import Sidebar from "./sidebar";
 import OpenAudyinButton from "./open-vibe";
-import AudiyinModal from "./roomModel";
+import AudiyinModal from "./CreateRoomModel";
 import ModalWrapper from "./modalWrapper";
-import RoomModal from "./roomModel";
+import RoomModal from "./CreateRoomModel";
 import { useRouter } from "next/navigation";
 
 function RoomCard({
@@ -239,19 +239,33 @@ export default function DashboardComp() {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="flex inside-0 items-center justify-center bg-black">
-              <button
+            <div className="flex inside-0 items-center justify-center ">
+              <Button
                 onClick={() => router.push("/join-the-vibe")}
-                className="px-6 py-3 bg-white/10 text-white rounded-xl hover:bg-white/20"
+                className="px-8 py-5 bg-white/10 text-white rounded-xl hover:bg-white/15"
               >
-                Join the Vibe <DoorOpen className="inline-block w-4 h-4 ml-2" />
-              </button>
+                <DoorOpen className="inline-block w-4 h-4" /> Join the Vibe
+              </Button>
 
-              {open && (
+              {/* {open && (
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-xl flex items-center justify-center">
                   <RoomModal />
                 </div>
-              )}
+              )} */}
+            </div>
+            <div className="flex inside-0 items-center justify-center ">
+              <Button
+                onClick={() => router.push("/create-the-vibe")}
+                className="px-8 py-5 bg-white/10 text-white rounded-xl hover:bg-white/15"
+              >
+                 <Plus className="inline-block w-2 h-4" /> Create Room
+              </Button>
+
+              {/* {open && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-xl flex items-center justify-center">
+                  <RoomModal />
+                </div>
+              )} */}
             </div>
             <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/40 flex items-center justify-center cursor-pointer hover:bg-white/30 transition-all duration-200">
               <span className="text-white font-semibold text-sm sm:text-base">
