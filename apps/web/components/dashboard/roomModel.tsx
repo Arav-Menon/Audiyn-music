@@ -25,17 +25,17 @@ export default function RoomModal() {
   };
 
   const onHandlerWsClick = () => {
-      const ws = new WebSocket(SOCKET_URL);
-      wsRef.current = ws;
+    const ws = new WebSocket(SOCKET_URL);
+    wsRef.current = ws;
 
-      ws.onopen = () => {
-        ws.send(
-          JSON.stringify({
-            type: "JOIN_ROOM",
-            payload: { code: code, password: password ?? null },
-          })
-        );
-      };
+    ws.onopen = () => {
+      ws.send(
+        JSON.stringify({
+          type: "JOIN_ROOM",
+          payload: { code: code, password: password ?? null },
+        })
+      );
+    };
   };
 
   return (
@@ -144,7 +144,7 @@ export default function RoomModal() {
       {/* Bottom Button */}
       <button
         className="w-full mt-8 bg-white/20 hover:bg-white/30 transition rounded-xl py-3 text-sm"
-        onClick={onHandlerWsClick}
+        onClick={onHandleClick}
       >
         Tune In
       </button>
