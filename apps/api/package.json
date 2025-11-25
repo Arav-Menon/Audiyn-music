@@ -7,7 +7,7 @@
     "@types/bun": "latest"
   },
   "scripts": {
-    "start:backend": "yarn server.ts"
+    "start:backend": "bun server.ts"
   },
   "peerDependencies": {
     "typescript": "^5"
