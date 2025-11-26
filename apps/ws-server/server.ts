@@ -21,10 +21,7 @@ wss.on("connection", (socket, req) => {
 
     socket.userId = user.id;
     room.joinRoom(socket);
-
-    socket.on("close", () => {
-      room.leaveRoom(socket)
-    })
+    room.leaveRoom(socket);
     socket.on("close", () => {
       room.removeUser(socket);
     });
