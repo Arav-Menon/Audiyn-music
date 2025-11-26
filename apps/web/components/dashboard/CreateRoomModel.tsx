@@ -31,7 +31,7 @@ export default function CreateRoomModal() {
       ws.send(
         JSON.stringify({
           type: "JOIN_ROOM",
-          payload: { code: code, password: password ?? null },
+          payload: { code: code, password: password || null },
         })
       );
     };
