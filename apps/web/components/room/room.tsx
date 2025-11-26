@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { getRoom } from "@/utils/join_room_api/api";
 import { useParams } from "next/navigation";
-import { ROOM_ID, SOCKET_URL, TOKEN } from "@/utils/api_url";
+import { SOCKET_URL } from "@/utils/api_url";
+import { Ruthie } from "next/font/google";
+import { useRouter } from "next/navigation";
 
 interface Message {
   id: string;
@@ -199,6 +201,7 @@ export default function RoomPage() {
   const { roomId } = useParams();
   const [roomName, setRoomName] = useState("");
   const [host, setHost] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
     const fetchRoom = async () => {
@@ -218,18 +221,23 @@ export default function RoomPage() {
   }, [roomId]);
 
   const onHandleWsClick = () => {
-    const ws = new WebSocket(SOCKET_URL, ["token", TOKEN as string]);
+    const ws = new WebSocket(SOCKET_URL, [
+      "token",
+      localStorage.getItem("token") as string,
+    ]);
 
     ws.onopen = () => {
       ws.send(
         JSON.stringify({
           type: "LEAVE_ROOM",
           payload: {
-            roomId: ROOM_ID,
+            roomId: localStorage.getItem("roomId"),
           },
         })
       );
     };
+    localStorage.removeItem("roomId");
+    router.push("/dashboard");
   };
 
   return (
