@@ -23,7 +23,7 @@ export default function JoinRoomModal() {
       ws.send(
         JSON.stringify({
           type: "JOIN_ROOM",
-          payload: { code: code, password: password ?? null },
+          payload: { code: code, password: password || null },
         })
       );
     };
@@ -32,6 +32,7 @@ export default function JoinRoomModal() {
       const data = JSON.parse(event.data);
 
       if (data.type === "JOIN_SUCCESS") {
+        console.log(data.roomId);
         router.push(`/r/${data.roomId}`);
         localStorage.setItem("roomId", data.roomId);
       }
