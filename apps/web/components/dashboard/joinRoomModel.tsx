@@ -6,25 +6,17 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 export default function JoinRoomModal() {
-  const [name, setName] = useState("");
   const [code, setCode] = useState("");
   const [isPrivate, setIsPrivate] = useState(false);
   const [password, setPassword] = useState("");
   const router = useRouter();
   const wsRef = useRef<WebSocket | null>(null);
 
-  const onHandleClick = async () => {
-    const response = await createRoom(name, code, isPrivate, password);
-
-    if (!response) {
-      console.log("something went wrong");
-    }
-
-    return router.push(`/r/${response}`);
-  };
-
   const onHandlerWsClick = () => {
-    const ws = new WebSocket(SOCKET_URL);
+    const ws = new WebSocket(SOCKET_URL, [
+      "token",
+      localStorage.getItem("token") as string,
+    ]);
     wsRef.current = ws;
 
     ws.onopen = () => {
@@ -34,6 +26,15 @@ export default function JoinRoomModal() {
           payload: { code: code, password: password ?? null },
         })
       );
+    };
+
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+
+      if (data.type === "JOIN_SUCCESS") {
+        router.push(`/r/${data.roomId}`);
+        localStorage.setItem("roomId", data.roomId);
+      }
     };
   };
 
