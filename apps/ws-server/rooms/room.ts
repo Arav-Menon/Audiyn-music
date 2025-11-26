@@ -18,6 +18,47 @@ export class Room {
   }
 
   private async removeHandler(socket: WebSocket) {
+    // try {
+    //   if (!socket.userId) return;
+
+    //   const findUser = await db.user.findUnique({
+    //     where: { id: socket.userId },
+    //   });
+
+    //   if (!findUser)
+    //     return socket.send(
+    //       JSON.stringify({
+    //         message: `user with this ${socket.userId} does not found`,
+    //       })
+    //     );
+
+    //   // Delete all room associations for this user
+    //   const deletedRooms = await db.roomUser.deleteMany({
+    //     where: { userId: socket.userId },
+    //   });
+
+    //   console.log(
+    //     `User ${socket.userId} disconnected and removed from ${deletedRooms.count} room(s)`
+    //   );
+
+    //   // Optional: Notify other users in the room via broadcast
+    //   // this.broadcastToRoom(roomId, { type: 'user_left', userId: socket.userId });
+
+    //   socket.send(
+    //     JSON.stringify({
+    //       message: `user with ${socket.userId} removed`,
+    //       deletedRooms,
+    //     })
+    //   );
+    // } catch (err) {
+    //   console.error(`Error removing user ${socket.userId}:`, err);
+    //   socket.send(
+    //     JSON.stringify({
+    //       message: err,
+    //     })
+    //   );
+    // }
+
     try {
       if (!socket.userId) return;
 
@@ -28,17 +69,17 @@ export class Room {
       if (!findUser)
         return socket.send(
           JSON.stringify({
-            message: `user with this ${socket.userId} does not found `,
+            message: `user with this ${socket.userId} does not found`,
           })
         );
 
       // Delete all room associations for this user
-      const deletedRooms = await db.roomUser.deleteMany({
-        where: { userId: socket.userId },
+      const deleteUser = await db.roomUser.delete({
+        where: { id: socket.userId },
       });
 
       console.log(
-        `User ${socket.userId} disconnected and removed from ${deletedRooms.count} room(s)`
+        `User ${socket.userId} disconnected and removed from ${deleteUser.userId} room(s)`
       );
 
       // Optional: Notify other users in the room via broadcast
@@ -46,8 +87,8 @@ export class Room {
 
       socket.send(
         JSON.stringify({
-          message: `user with ${socket.userId} removed`,
-          deletedRooms,
+          message: `USER_LEAVE`,
+          userId: deleteUser.userId,
         })
       );
     } catch (err) {
@@ -61,60 +102,55 @@ export class Room {
   }
 
   private async leaveHandler(socket: WebSocket) {
-    socket.on("message", async (data) => {
+    try {
       if (!socket.userId) return;
-      const message = JSON.parse(data.toString());
 
-      if (message.type == LEAVE_ROOM) {
-        const { roomId } = message.payload || {};
+      socket.on("message", async (data) => {
+        const message = JSON.parse(data.toString());
 
-        if (!roomId)
-          return socket.send(
-            JSON.stringify({
-              type: "Error",
-              message: "Missing roomId or userId",
-            })
+        if (message.type == LEAVE_ROOM) {
+          const { roomId } = message.payload || {};
+
+          const findUser = await db.user.findUnique({
+            where: { id: socket.userId },
+          });
+
+          const findRoom = await db.user.findUnique({
+            where: { id: roomId },
+          });
+
+          if (!findUser && !findRoom)
+            return socket.send(
+              JSON.stringify({
+                message: `user with this ${socket.userId} does not found`,
+              })
+            );
+
+          // Delete all room associations for this user
+          const deleteUser = await db.roomUser.delete({
+            where: { id: socket.userId },
+          });
+
+          console.log(
+            `User ${socket.userId} disconnected and removed from ${deleteUser.userId} room(s)`
           );
 
-        const findUser = await db.user.findUnique({
-          where: { id: socket.userId },
-        });
-
-        if (!findUser)
-          return socket.send(
+          socket.send(
             JSON.stringify({
-              type: "Error",
-              message: "Can't find user",
+              message: `USER_LEAVE`,
+              userId: deleteUser.userId,
             })
           );
-
-        const findRoom = await db.roomUser.findUnique({
-          where: {
-            id: roomId,
-          },
-        });
-
-        if (!findRoom)
-          return socket.send(
-            JSON.stringify({
-              type: "Error",
-              message: "can't find the room to leave",
-            })
-          );
-
-        await db.roomUser.delete({
-          where: {
-            id: roomId,
-          },
-        });
-
-        socket.send(
-          JSON.stringify({
-            message: "room  leave successfully",
-          })
-        );
-      }
-    });
+        }
+      });
+    } catch (err) {
+      console.error(`Error removing user ${socket.userId}:`, err);
+      socket.send(
+        JSON.stringify({
+          message: err,
+        })
+      );
+    }
   }
 
   private addHandler(socket: WebSocket) {
@@ -171,11 +207,12 @@ export class Room {
             socket.send(
               JSON.stringify({
                 type: "JOIN_SUCCESS",
+                roomId: roomAdded.roomId,
               })
             );
           }
 
-          await db.roomUser.create({
+          const roomAdded = await db.roomUser.create({
             data: {
               user: {
                 connect: {
@@ -189,6 +226,7 @@ export class Room {
           socket.send(
             JSON.stringify({
               type: "JOIN_SUCCESS",
+              roomId: roomAdded.roomId,
             })
           );
         }
