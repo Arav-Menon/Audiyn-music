@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { getRoom } from "@/utils/join_room_api/api";
 import { useParams } from "next/navigation";
+import { ROOM_ID, SOCKET_URL, TOKEN } from "@/utils/api_url";
 
 interface Message {
   id: string;
@@ -216,6 +217,21 @@ export default function RoomPage() {
     fetchRoom();
   }, [roomId]);
 
+  const onHandleWsClick = () => {
+    const ws = new WebSocket(SOCKET_URL, ["token", TOKEN as string]);
+
+    ws.onopen = () => {
+      ws.send(
+        JSON.stringify({
+          type: "LEAVE_ROOM",
+          payload: {
+            roomId: ROOM_ID,
+          },
+        })
+      );
+    };
+  };
+
   return (
     <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.15)_0%,transparent_70%)] text-white">
       {/* Top Bar */}
@@ -238,6 +254,7 @@ export default function RoomPage() {
             <Button
               variant="destructive"
               className="bg-red-600 hover:bg-red-700 text-white text-xs md:text-sm px-2 md:px-4 py-1 md:py-2 rounded-md h-auto"
+              onClick={onHandleWsClick}
             >
               Leave
             </Button>
