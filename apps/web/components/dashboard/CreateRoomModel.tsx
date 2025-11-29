@@ -1,9 +1,7 @@
 "use client";
-
-import { SOCKET_URL } from "@/utils/api_url";
 import { createRoom } from "@/utils/join_room_api/api";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 
 export default function CreateRoomModal() {
   const [name, setName] = useState("");
@@ -11,7 +9,6 @@ export default function CreateRoomModal() {
   const [isPrivate, setIsPrivate] = useState(false);
   const [password, setPassword] = useState("");
   const router = useRouter();
-  const wsRef = useRef<WebSocket | null>(null);
 
   const onHandleClick = async () => {
     const response = await createRoom(name, code, isPrivate, password);
