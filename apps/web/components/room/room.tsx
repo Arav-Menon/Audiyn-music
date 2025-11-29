@@ -220,6 +220,20 @@ export default function RoomPage() {
     fetchRoom();
   }, [roomId]);
 
+  useEffect(() => {
+    const fetchWsRoom = async () => {
+      try {
+        const ws = new WebSocket(SOCKET_URL, [
+          "token",
+          localStorage.getItem("token") as string
+        ])
+
+      }catch(err){
+        console.log("Fetch error:", err)
+      }
+    } 
+  })
+
   const onHandleWsClick = () => {
     const ws = new WebSocket(SOCKET_URL, [
       "token",
