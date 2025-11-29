@@ -203,6 +203,8 @@ export class Room {
               JSON.stringify({
                 type: "JOIN_SUCCESS",
                 roomId: roomAdded.roomId,
+                roomName: findRoom.name,
+                roomAdmin: findRoom.adminId,
               })
             );
           }
@@ -222,6 +224,8 @@ export class Room {
             JSON.stringify({
               type: "JOIN_SUCCESS",
               roomId: roomAdded.roomId,
+              roomName: findRoom.name,
+              roomAdmin: findRoom.adminId,
             })
           );
         }
