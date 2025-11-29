@@ -20,13 +20,13 @@ export const createRoom = async (
   name: string,
   code: string,
   isPrivate: boolean,
-  password: string
+  password: string | null
 ) => {
   const response = await axiosInstence.post("/room/create-room", {
     name,
     code,
     isPrivate,
-    password: password ?? null,
+    password: isPrivate ? password : null,
   });
   console.table(response);
   console.log(response.data);
@@ -38,6 +38,8 @@ export const createRoom = async (
 
   return response.data.newRoom.id;
 };
+
+console.log(createRoom);
 
 export const getRoom = async (roomId: string) => {
   const response = await axiosInstence.get(`/room/${roomId}`);
