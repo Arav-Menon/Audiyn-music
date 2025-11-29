@@ -23,24 +23,12 @@ export default function CreateRoomModal() {
     return router.push(`/r/${response}`);
   };
 
-  const onHandlerWsClick = () => {
-    const ws = new WebSocket(SOCKET_URL);
-    wsRef.current = ws;
-
-    ws.onopen = () => {
-      ws.send(
-        JSON.stringify({
-          type: "JOIN_ROOM",
-          payload: { code: code, password: password || null },
-        })
-      );
-    };
-  };
-
   return (
     <div className="w-[500px] rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 p-6 shadow-xl text-white">
       {/* Header */}
-      <h1 className="text-2xl font-semi-bold text-white/70 mb-6">Audiyn / create room</h1>
+      <h1 className="text-2xl font-semi-bold text-white/70 mb-6">
+        Audiyn / create room
+      </h1>
 
       {/* CREATE ROOM UI */}
       <div className="space-y-5">
@@ -68,7 +56,9 @@ export default function CreateRoomModal() {
         <div className="flex items-center justify-between">
           <span className="text-sm opacity-70">Make Private</span>
           <button
-            onClick={() => setIsPrivate(!isPrivate)}
+            onClick={() => {
+              setIsPrivate(true);
+            }}
             className={`w-10 h-5 flex items-center rounded-full transition ${
               isPrivate ? "bg-white/20" : "bg-white/10"
             }`}
