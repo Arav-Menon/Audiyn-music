@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { getRoom } from "@/utils/join_room_api/api";
 import { useParams } from "next/navigation";
 import { SOCKET_URL } from "@/utils/api_url";
 import { Ruthie } from "next/font/google";
 import { useRouter } from "next/navigation";
+import { Search } from "lucide-react";
+import { Socket } from "dgram";
 
 interface Message {
   id: string;
@@ -39,6 +41,8 @@ const mockSearchResults = [
   { id: "s2", title: "Blinding Lights", artist: "The Weeknd", thumbnail: "💡" },
   { id: "s3", title: "Save Your Tears", artist: "The Weeknd", thumbnail: "💧" },
   { id: "s4", title: "After Hours", artist: "The Weeknd", thumbnail: "🌙" },
+  { id: "s1", title: "Starlight", artist: "The Weeknd", thumbnail: "🌟" },
+  { id: "s2", title: "Blinding Lights", artist: "The Weeknd", thumbnail: "💡" },
 ];
 
 export default function RoomPage() {
@@ -67,8 +71,7 @@ export default function RoomPage() {
   ]);
 
   const [messageInput, setMessageInput] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [showSearchResults, setShowSearchResults] = useState(false);
+  // const [showSearchResults, setShowSearchResults] = useState(false);
   const [selectedGenre, setSelectedGenre] = useState("User choice");
 
   const genres = ["User choice", "Drill", "Melody", "Hip hop", "Rock"];
@@ -195,44 +198,56 @@ export default function RoomPage() {
     };
     setQueueSongs([...queueSongs, newSong]);
     setSearchQuery("");
-    setShowSearchResults(false);
   };
   // Fetch and set the room name for the user
   const { roomId } = useParams();
   const [roomName, setRoomName] = useState("");
   const [host, setHost] = useState("");
   const router = useRouter();
+  const debounceRef = useRef(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  // useEffect(() => {
+  //   const fetchRoom = async () => {
+  //     try {
+  //       const response = await getRoom(roomId as string);
+
+  //       // backend structure ke hisaab se adjust
+  //       setRoomName(response.room.name);
+  //       setHost(response.admin.username);
+  //     } catch (err) {
+  //       console.log("Fetch error:", err);
+  //       setRoomName("Unknown Room");
+  //     }
+  //   };
+  //   fetchRoom();
+  // }, [roomId]);
 
   useEffect(() => {
-    const fetchRoom = async () => {
-      try {
-        const response = await getRoom(roomId as string);
+    const ws = new WebSocket(SOCKET_URL, [
+      "token",
+      localStorage.getItem("token") as string,
+    ]);
 
-        // backend structure ke hisaab se adjust
-        setRoomName(response.room.name);
-        setHost(response.admin.username);
-      } catch (err) {
-        console.log("Fetch error:", err);
-        setRoomName("Unknown Room");
+    ws.onopen = () => console.log("connected");
+
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      console.log("WS DATA:", data);
+
+      if (data.type === "JOIN_SUCCESS") {
+        setRoomName(data.roomName);
+        setHost(data.roomAdmin);
       }
     };
 
-    fetchRoom();
+    ws.onerror = (e) => console.log("WS ERROR:", e);
+    ws.onclose = () => console.log("WS CLOSED");
+
+    return () => ws.close();
   }, [roomId]);
-
-  useEffect(() => {
-    const fetchWsRoom = async () => {
-      try {
-        const ws = new WebSocket(SOCKET_URL, [
-          "token",
-          localStorage.getItem("token") as string
-        ])
-
-      }catch(err){
-        console.log("Fetch error:", err)
-      }
-    } 
-  })
 
   const onHandleWsClick = () => {
     const ws = new WebSocket(SOCKET_URL, [
@@ -253,6 +268,61 @@ export default function RoomPage() {
     localStorage.removeItem("roomId");
     router.push("/dashboard");
   };
+
+  //search song api request
+
+  useEffect(() => {
+    const ws = new WebSocket(SOCKET_URL, [
+      "token",
+      localStorage.getItem("token") as string,
+    ]);
+
+    if (!searchQuery) {
+      setSearchResults([]);
+      setShowDropdown(false);
+      return;
+    }
+
+    // debounce 400ms
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    //@ts-ignore
+    debounceRef.current = setTimeout(() => {
+      const body = {
+        type: "SEARCH_SONG",
+        payload: {
+          songName: searchQuery,
+          roomId: roomId,
+        },
+      };
+
+      ws.send(JSON.stringify(body));
+    }, 400);
+
+    //@ts-ignore
+    return () => clearTimeout(debounceRef.current);
+  }, [searchQuery]);
+
+  // 🟦 2. Listen WS responses
+  useEffect(() => {
+    const ws = new WebSocket(SOCKET_URL, [
+      "token",
+      localStorage.getItem("token") as string,
+    ]);
+    ws.onmessage = (event) => {
+      const msg = JSON.parse(event.data);
+
+      if (msg.type === "Success") {
+        setSearchResults([msg.stream.savedStream] as any); // FIXED
+        setShowDropdown(true);
+      }
+
+      if (msg.type === "SONG_RESULTS") {
+        setSearchResults(msg.payload.songs);
+        setShowDropdown(true);
+      }
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.15)_0%,transparent_70%)] text-white">
@@ -354,25 +424,12 @@ export default function RoomPage() {
             {/* Search Bar */}
             <div className="relative">
               <div className="bg-white/5 border border-white/10 rounded-xl p-3 md:p-4 flex items-center gap-3">
-                <svg
-                  className="w-4 h-4 md:w-5 md:h-5 text-gray-400 flex-shrink-0"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
+                <Search className="w-4 h-6" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
-                    setShowSearchResults(e.target.value.length > 0);
                   }}
                   placeholder="Search the song"
                   className="flex-1 bg-transparent text-sm md:text-base text-white placeholder-gray-500 focus:outline-none"
@@ -380,10 +437,10 @@ export default function RoomPage() {
               </div>
 
               {/* Search Results Dropdown */}
-              {showSearchResults && searchQuery && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-gray-900 border border-gray-800 rounded-xl overflow-hidden z-50 shadow-2xl">
-                  {mockSearchResults
-                    .filter(
+              {showDropdown && searchQuery && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-black/60 border border-gray-800 rounded-xl overflow-hidden z-50 shadow-2xl">
+                  {
+                    searchResults.filter(
                       (song) =>
                         song.title
                           .toLowerCase()
@@ -395,7 +452,7 @@ export default function RoomPage() {
                     .map((song) => (
                       <div
                         key={song.id}
-                        className="flex items-center gap-3 p-3 md:p-4 hover:bg-gray-800 cursor-pointer transition-all border-b border-gray-800 last:border-0"
+                        className="flex items-center gap-3 p-3 md:p-4 hover:bg-black/40 cursor-pointer transition-all border-b border-gray-800 last:border-0"
                         onClick={() => handleAddToQueue(song)}
                       >
                         <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg flex items-center justify-center text-lg md:text-xl flex-shrink-0">
@@ -409,7 +466,7 @@ export default function RoomPage() {
                             {song.artist}
                           </p>
                         </div>
-                        <Button className="bg-purple-600 hover:bg-purple-700 text-white text-xs px-3 md:px-4 py-1.5 md:py-2 rounded-lg h-auto flex-shrink-0">
+                        <Button className="bg-white/30 hover:bg-white/40 text-white text-xs px-3 md:px-4 py-1.5 md:py-2 rounded-lg h-auto flex-shrink-0">
                           Add
                         </Button>
                       </div>
