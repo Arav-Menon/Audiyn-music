@@ -2,13 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { getRoom } from "@/utils/join_room_api/api";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { SOCKET_URL } from "@/utils/api_url";
-import { Ruthie } from "next/font/google";
-import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
-import { Socket } from "dgram";
 
 interface Message {
   id: string;
@@ -16,13 +12,6 @@ interface Message {
   avatar: string;
   text: string;
   timestamp: string;
-}
-
-interface Participant {
-  id: string;
-  name: string;
-  avatar: string;
-  isHost?: boolean;
 }
 
 interface Song {
@@ -36,60 +25,23 @@ interface Song {
   videoUrl?: string;
 }
 
-const mockSearchResults = [
-  { id: "s1", title: "Starlight", artist: "The Weeknd", thumbnail: "🌟" },
-  { id: "s2", title: "Blinding Lights", artist: "The Weeknd", thumbnail: "💡" },
-  { id: "s3", title: "Save Your Tears", artist: "The Weeknd", thumbnail: "💧" },
-  { id: "s4", title: "After Hours", artist: "The Weeknd", thumbnail: "🌙" },
-  { id: "s1", title: "Starlight", artist: "The Weeknd", thumbnail: "🌟" },
-  { id: "s2", title: "Blinding Lights", artist: "The Weeknd", thumbnail: "💡" },
-];
-
 export default function RoomPage() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      user: "Alex",
-      avatar: "👨",
-      text: "This track is fire! 🔥",
-      timestamp: "2:34 PM",
-    },
-    {
-      id: "2",
-      user: "Jordan",
-      avatar: "👩",
-      text: "Love this vibe!",
-      timestamp: "2:35 PM",
-    },
-    {
-      id: "3",
-      user: "Casey",
-      avatar: "👨‍🦱",
-      text: "Keep it up 🎵",
-      timestamp: "2:36 PM",
-    },
-  ]);
-
+  const { roomId } = useParams();
+  const router = useRouter();
+  
+  // WebSocket ref to persist connection
+  const wsRef = useRef<WebSocket | null>(null);
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // State
+  const [roomName, setRoomName] = useState("");
+  const [host, setHost] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [messageInput, setMessageInput] = useState("");
-  // const [showSearchResults, setShowSearchResults] = useState(false);
-  const [selectedGenre, setSelectedGenre] = useState("User choice");
-
-  const genres = ["User choice", "Drill", "Melody", "Hip hop", "Rock"];
-  const genreVotes = {
-    "User choice": 98,
-    Drill: 98,
-    Melody: 74,
-    "Hip hop": 63,
-    Rock: 41,
-  };
-
-  const [participants] = useState<Participant[]>([
-    { id: "1", name: "Sarah", avatar: "👩", isHost: true },
-    { id: "2", name: "Mike", avatar: "👨" },
-    { id: "3", name: "Emma", avatar: "👩‍🦰" },
-    { id: "4", name: "Dev", avatar: "🧑‍💻" },
-  ]);
-
+  const [queueSongs, setQueueSongs] = useState<Song[]>([]);
   const [nowPlaying] = useState<Song>({
     id: "np1",
     title: "On Top",
@@ -101,60 +53,171 @@ export default function RoomPage() {
     videoUrl: "https://www.youtube.com/embed/8e1S7Y5KAFM?si=rJiacOp39bH-kgLM",
   });
 
-  const [queueSongs, setQueueSongs] = useState<Song[]>([
-    {
-      id: "q1",
-      title: "makasam",
-      artist: "Krsna",
-      votes: 98,
-      thumbnail:
-        "https://i.ytimg.com/vi/JgDNFQ2RaLQ/hqdefault.jpg?sqp=-oaymwEmCKgBEF5IWvKriqkDGQgBFQAAiEIYAdgBAeIBCggYEAIYBjgBQAE=&rs=AOn4CLDaCZagWy7JA54Qr8RHleRe-05BVQ",
-      addedBy: "Mike",
-      date: "12-07-2024",
-    },
-    {
-      id: "q2",
-      title: "softly",
-      artist: "Karan Aujla",
-      votes: 74,
-      thumbnail:
-        "https://i.ytimg.com/vi/t7wSjy9Lv-o/hqdefault.jpg?sqp=-oaymwEmCKgBEF5IWvKriqkDGQgBFQAAiEIYAdgBAeIBCggYEAIYBjgBQAE=&rs=AOn4CLDY92waHiwPJShyE7miw6kdJD-U5Q",
-      addedBy: "Emma",
-      date: "12-07-2024",
-    },
-    {
-      id: "q3",
-      title: "100 million",
-      artist: "Divine",
-      votes: 63,
-      thumbnail:
-        "https://i.ytimg.com/vi/-urTPhh7gNk/hqdefault.jpg?sqp=-oaymwEmCKgBEF5IWvKriqkDGQgBFQAAiEIYAdgBAeIBCggYEAIYBjgBQAE=&rs=AOn4CLBNdjvIt4MpJ_7BSx4nIepNfrg0nQ",
-      addedBy: "Dev",
-      date: "12-07-2024",
-    },
-    {
-      id: "q4",
-      title: "volume 1",
-      artist: "Various",
-      votes: 41,
-      thumbnail:
-        "https://i.ytimg.com/vi/yDkIFW7eJ04/hqdefault.jpg?sqp=-oaymwEmCKgBEF5IWvKriqkDGQgBFQAAiEIYAdgBAeIBCggYEAIYBjgBQAE=&rs=AOn4CLB27LPmnLWNGW_Azbe-M9FVFNL2rQ",
-      addedBy: "Sarah",
-      date: "12-07-2024",
-    },
-  ]);
+  // ✅ SINGLE WebSocket Connection
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/login");
+      return;
+    }
 
-  const [topVoted] = useState([
-    { title: "makasam", artist: "Krsna", percentage: 97, thumbnail: "🎤" },
-    {
-      title: "Winner Speech",
-      artist: "Karan Aujla",
-      percentage: 74,
-      thumbnail: "🏆",
-    },
-    { title: "Softly", artist: "Karan Aujla", percentage: 68, thumbnail: "🎶" },
-  ]);
+    // Create WebSocket connection
+    const ws = new WebSocket(SOCKET_URL, ["token", token]);
+    wsRef.current = ws;
 
+    ws.onopen = () => {
+      console.log("✅ WebSocket Connected");
+    };
+
+    ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        console.log("📨 WS Message:", data);
+
+        // Handle different message types
+        switch (data.type) {
+          case "JOIN_SUCCESS":
+            setRoomName(data.roomName);
+            setHost(data.roomAdmin);
+            break;
+
+          case "Success":
+            // When song is saved successfully
+            console.log("✅ Song saved:", data.message);
+            if (data.savedStream) {
+              // Extract thumbnail URL from object array
+              const processedStream = {
+                ...data.savedStream,
+                thumbnail: data.savedStream.thumbnails?.[0]?.url || data.savedStream.thumbnail || "🎵"
+              };
+              setSearchResults([processedStream]);
+              setShowDropdown(true);
+            }
+            break;
+
+          case "SONG_RESULTS":
+            // When search results are received
+            console.log("🔍 Search results:", data.payload.songs);
+            const songs = data.payload.songs || [];
+            // Process thumbnails - extract URL from thumbnail object/array
+            const processedSongs = songs.map((song: any) => ({
+              ...song,
+              thumbnail: song.thumbnails?.[0]?.url || song.thumbnail || "🎵"
+            }));
+            setSearchResults(processedSongs);
+            setShowDropdown(processedSongs.length > 0);
+            break;
+
+          case "Error":
+            console.error("❌ Error:", data.message);
+            break;
+
+          default:
+            console.log("Unknown message type:", data.type);
+        }
+      } catch (error) {
+        console.error("Error parsing WS message:", error);
+      }
+    };
+
+    ws.onerror = (error) => {
+      console.error("❌ WebSocket Error:", error);
+    };
+
+    ws.onclose = () => {
+      console.log("🔴 WebSocket Closed");
+    };
+
+    // Cleanup on unmount
+    return () => {
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.close();
+      }
+    };
+  }, [roomId, router]);
+
+  // ✅ Search with debounce
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      setShowDropdown(false);
+      return;
+    }
+
+    // Clear previous timeout
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
+
+    // Debounce search request
+    debounceRef.current = setTimeout(() => {
+      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+        const searchMessage = {
+          type: "SEARCH_SONG",
+          payload: {
+            songName: searchQuery,
+            roomId: roomId,
+          },
+        };
+        
+        console.log("🔍 Sending search:", searchMessage);
+        wsRef.current.send(JSON.stringify(searchMessage));
+      } else {
+        console.error("WebSocket not connected");
+      }
+    }, 400);
+
+    return () => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+    };
+  }, [searchQuery, roomId]);
+
+  // Leave room handler
+  const handleLeaveRoom = () => {
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(
+        JSON.stringify({
+          type: "LEAVE_ROOM",
+          payload: {
+            roomId: localStorage.getItem("roomId"),
+          },
+        })
+      );
+    }
+    localStorage.removeItem("roomId");
+    router.push("/dashboard");
+  };
+
+  // Add song to queue
+  const handleAddToQueue = (song: any) => {
+    const newSong: Song = {
+      id: Date.now().toString(),
+      title: song.title,
+      artist: song.artist,
+      votes: 0,
+      thumbnail: song.thumbnail, // Already processed from WebSocket
+      addedBy: "You",
+      date: new Date().toLocaleDateString("en-GB"),
+    };
+    setQueueSongs([...queueSongs, newSong]);
+    setSearchQuery("");
+    setShowDropdown(false);
+  };
+
+  // Vote handler
+  const handleVote = (songId: string) => {
+    setQueueSongs(
+      queueSongs
+        .map((song) =>
+          song.id === songId ? { ...song, votes: song.votes + 1 } : song
+        )
+        .sort((a, b) => b.votes - a.votes)
+    );
+  };
+
+  // Send chat message
   const handleSendMessage = () => {
     if (messageInput.trim()) {
       const newMessage: Message = {
@@ -172,158 +235,6 @@ export default function RoomPage() {
     }
   };
 
-  const handleVote = (songId: string) => {
-    setQueueSongs(
-      queueSongs
-        .map((song) =>
-          song.id === songId ? { ...song, votes: song.votes + 1 } : song
-        )
-        .sort((a, b) => b.votes - a.votes)
-    );
-  };
-
-  const handleAddToQueue = (song: any) => {
-    const newSong: Song = {
-      id: Date.now().toString(),
-      title: song.title,
-      artist: song.artist,
-      votes: 0,
-      thumbnail: song.thumbnail,
-      addedBy: "You",
-      date: new Date().toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-      }),
-    };
-    setQueueSongs([...queueSongs, newSong]);
-    setSearchQuery("");
-  };
-  // Fetch and set the room name for the user
-  const { roomId } = useParams();
-  const [roomName, setRoomName] = useState("");
-  const [host, setHost] = useState("");
-  const router = useRouter();
-  const debounceRef = useRef(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
-  const [showDropdown, setShowDropdown] = useState(false);
-
-  // useEffect(() => {
-  //   const fetchRoom = async () => {
-  //     try {
-  //       const response = await getRoom(roomId as string);
-
-  //       // backend structure ke hisaab se adjust
-  //       setRoomName(response.room.name);
-  //       setHost(response.admin.username);
-  //     } catch (err) {
-  //       console.log("Fetch error:", err);
-  //       setRoomName("Unknown Room");
-  //     }
-  //   };
-  //   fetchRoom();
-  // }, [roomId]);
-
-  useEffect(() => {
-    const ws = new WebSocket(SOCKET_URL, [
-      "token",
-      localStorage.getItem("token") as string,
-    ]);
-
-    ws.onopen = () => console.log("connected");
-
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      console.log("WS DATA:", data);
-
-      if (data.type === "JOIN_SUCCESS") {
-        setRoomName(data.roomName);
-        setHost(data.roomAdmin);
-      }
-    };
-
-    ws.onerror = (e) => console.log("WS ERROR:", e);
-    ws.onclose = () => console.log("WS CLOSED");
-
-    return () => ws.close();
-  }, [roomId]);
-
-  const onHandleWsClick = () => {
-    const ws = new WebSocket(SOCKET_URL, [
-      "token",
-      localStorage.getItem("token") as string,
-    ]);
-
-    ws.onopen = () => {
-      ws.send(
-        JSON.stringify({
-          type: "LEAVE_ROOM",
-          payload: {
-            roomId: localStorage.getItem("roomId"),
-          },
-        })
-      );
-    };
-    localStorage.removeItem("roomId");
-    router.push("/dashboard");
-  };
-
-  //search song api request
-
-  useEffect(() => {
-    const ws = new WebSocket(SOCKET_URL, [
-      "token",
-      localStorage.getItem("token") as string,
-    ]);
-
-    if (!searchQuery) {
-      setSearchResults([]);
-      setShowDropdown(false);
-      return;
-    }
-
-    // debounce 400ms
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-
-    //@ts-ignore
-    debounceRef.current = setTimeout(() => {
-      const body = {
-        type: "SEARCH_SONG",
-        payload: {
-          songName: searchQuery,
-          roomId: roomId,
-        },
-      };
-
-      ws.send(JSON.stringify(body));
-    }, 400);
-
-    //@ts-ignore
-    return () => clearTimeout(debounceRef.current);
-  }, [searchQuery]);
-
-  // 🟦 2. Listen WS responses
-  useEffect(() => {
-    const ws = new WebSocket(SOCKET_URL, [
-      "token",
-      localStorage.getItem("token") as string,
-    ]);
-    ws.onmessage = (event) => {
-      const msg = JSON.parse(event.data);
-
-      if (msg.type === "Success") {
-        setSearchResults([msg.stream.savedStream] as any); // FIXED
-        setShowDropdown(true);
-      }
-
-      if (msg.type === "SONG_RESULTS") {
-        setSearchResults(msg.payload.songs);
-        setShowDropdown(true);
-      }
-    };
-  }, []);
-
   return (
     <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.15)_0%,transparent_70%)] text-white">
       {/* Top Bar */}
@@ -333,11 +244,6 @@ export default function RoomPage() {
             <img src="/audiyn.png" className="h-8 w-8 md:h-12 md:w-12" alt="" />
             <span className="sm:inline">/</span>
             <h2 className="text-sm md:text-base">{roomName}</h2>
-            <div className="hidden sm:block h-6 w-px bg-gray-700" />
-            <div className="hidden md:flex items-center gap-2 text-sm text-gray-400">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-              <span>2,847 listeners</span>
-            </div>
           </div>
           <div className="flex items-center gap-2 md:gap-3">
             <div className="px-2 md:px-4 py-1 md:py-2 rounded-lg flex bg-white/20 items-center justify-center">
@@ -346,7 +252,7 @@ export default function RoomPage() {
             <Button
               variant="destructive"
               className="bg-red-600 hover:bg-red-700 text-white text-xs md:text-sm px-2 md:px-4 py-1 md:py-2 rounded-md h-auto"
-              onClick={onHandleWsClick}
+              onClick={handleLeaveRoom}
             >
               Leave
             </Button>
@@ -357,69 +263,7 @@ export default function RoomPage() {
       {/* Main Content */}
       <div className="pt-[68px] md:pt-[84px] mt-2 px-3 md:px-6 pb-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
-          {/* Left Section - Queue (Mobile: below video, Desktop: left side) */}
-          <div className="lg:col-span-3 order-2 lg:order-1 space-y-4 md:space-y-6">
-            {/* Most Voted for Next */}
-            <div className="bg-white/5 rounded-xl md:rounded-2xl p-4 md:p-6 border border-white/10">
-              <h3 className="text-sm font-semibold mb-4">
-                Most voted for next
-              </h3>
-              <div className="aspect-video bg-black rounded-xl overflow-hidden">
-                <img
-                  src="https://i.ytimg.com/vi/-ub7fpR6tM4/hqdefault.jpg?sqp=-oaymwEmCKgBEF5IWvKriqkDGQgBFQAAiEIYAdgBAeIBCggYEAIYBjgBQAE=&rs=AOn4CLA-XmAsHkbRm5-Tw2Ljcyqw73xd7Q"
-                  alt="Most voted"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            </div>
-
-            {/* Queue Songs */}
-            <div className="bg-white/10 rounded-xl md:rounded-2xl p-4 md:p-6 border border-white/5">
-              <h3 className="text-sm font-semibold mb-4">Queue Songs</h3>
-              <div className="space-y-3">
-                {queueSongs.map((song, idx) => (
-                  <div
-                    key={song.id}
-                    className="flex items-center gap-2 md:gap-3 p-2 md:p-3 bg-white/5 rounded-lg transition-all"
-                  >
-                    <div className="w-16 h-10 md:w-24 md:h-14 bg-black rounded-lg flex items-center justify-center text-xl flex-shrink-0">
-                      <img
-                        src={song.thumbnail}
-                        alt=""
-                        className="rounded-sm w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs md:text-sm font-semibold truncate">
-                        {song.title}
-                      </p>
-                      <p className="text-xs text-gray-400 truncate">
-                        {song.artist}
-                      </p>
-                      <p className="text-xs text-gray-500 hidden md:block">
-                        {song.date}
-                      </p>
-                    </div>
-                    <div className="flex flex-col items-end gap-1 md:gap-2">
-                      <div className="flex items-center gap-1 md:gap-2">
-                        <div className="bg-white/20 text-white/95 px-1.5 md:px-2 py-0.5 md:py-1 rounded text-xs font-bold">
-                          {song.votes}
-                        </div>
-                        <Button
-                          onClick={() => handleVote(song.id)}
-                          className="bg-white/90 hover:bg-white/75 cursor-pointer text-black text-xs px-2 md:px-3 py-1 rounded h-auto"
-                        >
-                          Vote
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Center Section - Video Player */}
+          {/* Center Section - Video & Search */}
           <div className="lg:col-span-6 order-1 lg:order-2 space-y-4 md:space-y-6">
             {/* Search Bar */}
             <div className="relative">
@@ -428,62 +272,43 @@ export default function RoomPage() {
                 <input
                   type="text"
                   value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                  }}
-                  placeholder="Search the song"
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search for songs..."
                   className="flex-1 bg-transparent text-sm md:text-base text-white placeholder-gray-500 focus:outline-none"
                 />
               </div>
 
               {/* Search Results Dropdown */}
-              {showDropdown && searchQuery && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-black/60 border border-gray-800 rounded-xl overflow-hidden z-50 shadow-2xl">
-                  {
-                    searchResults.filter(
-                      (song) =>
-                        song.title
-                          .toLowerCase()
-                          .includes(searchQuery.toLowerCase()) ||
-                        song.artist
-                          .toLowerCase()
-                          .includes(searchQuery.toLowerCase())
-                    )
-                    .map((song) => (
-                      <div
-                        key={song.id}
-                        className="flex items-center gap-3 p-3 md:p-4 hover:bg-black/40 cursor-pointer transition-all border-b border-gray-800 last:border-0"
-                        onClick={() => handleAddToQueue(song)}
-                      >
-                        <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg flex items-center justify-center text-lg md:text-xl flex-shrink-0">
-                          {song.thumbnail}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold truncate">
-                            {song.title}
-                          </p>
-                          <p className="text-xs text-gray-400 truncate">
-                            {song.artist}
-                          </p>
-                        </div>
-                        <Button className="bg-white/30 hover:bg-white/40 text-white text-xs px-3 md:px-4 py-1.5 md:py-2 rounded-lg h-auto flex-shrink-0">
-                          Add
-                        </Button>
+              {showDropdown && searchResults.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-black/95 border border-gray-800 rounded-xl overflow-hidden z-50 shadow-2xl max-h-96 overflow-y-auto">
+                  {searchResults.map((song, index) => (
+                    <div
+                      key={song.id || index}
+                      className="flex items-center gap-3 p-3 md:p-4 hover:bg-white/10 cursor-pointer transition-all border-b border-gray-800 last:border-0"
+                      onClick={() => handleAddToQueue(song)}
+                    >
+                      <div className="w-12 h-12 bg-gray-700 rounded-lg overflow-hidden flex-shrink-0">
+                        {song.thumbnail && song.thumbnail.startsWith('http') ? (
+                          <img 
+                            src={song.thumbnail} 
+                            alt={song.title}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-2xl">
+                            🎵
+                          </div>
+                        )}
                       </div>
-                    ))}
-                  {mockSearchResults.filter(
-                    (song) =>
-                      song.title
-                        .toLowerCase()
-                        .includes(searchQuery.toLowerCase()) ||
-                      song.artist
-                        .toLowerCase()
-                        .includes(searchQuery.toLowerCase())
-                  ).length === 0 && (
-                    <div className="p-4 text-center text-gray-400 text-sm">
-                      No results found for "{searchQuery}"
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold truncate">{song.title}</p>
+                        <p className="text-xs text-gray-400 truncate">{song.artist}</p>
+                      </div>
+                      <Button className="bg-purple-600 hover:bg-purple-700 text-white text-xs px-4 py-2 rounded-lg">
+                        Add
+                      </Button>
                     </div>
-                  )}
+                  ))}
                 </div>
               )}
             </div>
@@ -493,10 +318,7 @@ export default function RoomPage() {
               <div className="relative aspect-video bg-black">
                 <iframe
                   className="absolute inset-0 w-full h-full"
-                  src={
-                    nowPlaying.videoUrl ||
-                    "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1"
-                  }
+                  src={nowPlaying.videoUrl}
                   title="YouTube video player"
                   frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -504,80 +326,64 @@ export default function RoomPage() {
                 />
               </div>
             </div>
+          </div>
 
-            {/* Song of the Day */}
-            <div className="bg-white/5 rounded-xl md:rounded-2xl p-4 md:p-6 border border-gray-800">
-              <h3 className="text-sm font-semibold text-gray-400 mb-4">
-                Song of the day
-              </h3>
-              <div className="flex flex-col sm:flex-row gap-4 mb-4">
-                <div className="w-full sm:w-38 h-40 sm:h-22 bg-white/10 rounded-lg flex items-center justify-center overflow-hidden">
-                  <img
-                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR5F-xABWoed1Q9SmMEzasYNgx4NRH-aoBRKQ&s"
-                    alt=""
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-xs text-gray-400">659 votes</span>
-                    <span className="text-xs text-green-400">like 98%</span>
+          {/* Queue Section */}
+          <div className="lg:col-span-3 order-2 space-y-4">
+            <div className="bg-white/10 rounded-xl p-4 border border-white/5">
+              <h3 className="text-sm font-semibold mb-4">Queue Songs</h3>
+              <div className="space-y-3">
+                {queueSongs.map((song) => (
+                  <div
+                    key={song.id}
+                    className="flex items-center gap-3 p-3 bg-white/5 rounded-lg"
+                  >
+                    <div className="w-16 h-16 bg-black rounded-lg overflow-hidden flex-shrink-0">
+                      <img
+                        src={song.thumbnail}
+                        alt=""
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold truncate">{song.title}</p>
+                      <p className="text-xs text-gray-400 truncate">{song.artist}</p>
+                    </div>
+                    <Button
+                      onClick={() => handleVote(song.id)}
+                      className="bg-purple-600 hover:bg-purple-700 text-white text-xs px-3 py-1 rounded"
+                    >
+                      {song.votes} ↑
+                    </Button>
                   </div>
-                  <Button className="w-full bg-white/10 hover:bg-white/20 text-white text-sm rounded-lg py-2">
-                    Add to play again
-                  </Button>
-                </div>
-              </div>
-              <div className="grid grid-cols-3 gap-2 md:gap-4 pt-4 border-t border-gray-700">
-                <div>
-                  <p className="text-xs text-gray-400 mb-1">up votes</p>
-                  <p className="text-base md:text-lg font-bold">659</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400 mb-1">views</p>
-                  <p className="text-base md:text-lg font-bold">100m</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400 mb-1">Date</p>
-                  <p className="text-xs md:text-sm">15-09-2024</p>
-                </div>
+                ))}
               </div>
             </div>
           </div>
 
-          {/* Right Section - Chat */}
-          <div className="lg:col-span-3 order-3 space-y-4 md:space-y-6">
-            <div className="bg-white/5 rounded-xl md:rounded-2xl border border-white/10 flex flex-col h-[500px] lg:h-[calc(100vh-140px)]">
-              <div className="p-3 md:p-4 border-b border-white/10">
-                <h3 className="text-sm font-semibold">
-                  Live Chat ({participants.length} online)
-                </h3>
+          {/* Chat Section */}
+          <div className="lg:col-span-3 order-3">
+            <div className="bg-white/5 rounded-xl border border-white/10 flex flex-col h-[500px]">
+              <div className="p-4 border-b border-white/10">
+                <h3 className="text-sm font-semibold">Live Chat</h3>
               </div>
-
-              <div className="flex-1 overflow-y-auto p-3 md:p-4 space-y-3">
+              <div className="flex-1 overflow-y-auto p-4 space-y-3">
                 {messages.map((msg) => (
-                  <div key={msg.id} className="flex gap-2 md:gap-3">
-                    <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 text-base md:text-lg">
+                  <div key={msg.id} className="flex gap-3">
+                    <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
                       {msg.avatar}
                     </div>
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs md:text-sm font-semibold truncate">
-                          {msg.user}
-                        </span>
-                        <span className="text-xs text-gray-500 flex-shrink-0">
-                          {msg.timestamp}
-                        </span>
+                        <span className="text-sm font-semibold">{msg.user}</span>
+                        <span className="text-xs text-gray-500">{msg.timestamp}</span>
                       </div>
-                      <p className="text-xs md:text-sm text-gray-300 break-words">
-                        {msg.text}
-                      </p>
+                      <p className="text-sm text-gray-300">{msg.text}</p>
                     </div>
                   </div>
                 ))}
               </div>
-
-              <div className="p-3 md:p-4 border-t border-white/10">
+              <div className="p-4 border-t border-white/10">
                 <div className="flex gap-2">
                   <input
                     type="text"
@@ -585,11 +391,11 @@ export default function RoomPage() {
                     onChange={(e) => setMessageInput(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
                     placeholder="Type a message..."
-                    className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 md:px-4 py-2 text-xs md:text-sm text-white placeholder-gray-500 focus:outline-none focus:border-white/20"
+                    className="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm text-white placeholder-gray-500 focus:outline-none"
                   />
                   <Button
                     onClick={handleSendMessage}
-                    className="bg-white/10 hover:bg-white/15 text-white px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm h-auto"
+                    className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg"
                   >
                     Send
                   </Button>
