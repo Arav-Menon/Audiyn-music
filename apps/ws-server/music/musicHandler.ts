@@ -91,7 +91,7 @@ export class MusicHandler {
             JSON.stringify({
               type: "Success",
               message: "Song stored successfully",
-              stream: savedStream,
+              savedStream
             })
           );
         }
