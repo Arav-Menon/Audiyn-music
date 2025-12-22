@@ -8,3 +8,9 @@ NODE_VERSION = "20"
 
 [[plugins]]
 package = "@netlify/plugin-nextjs"
+
+[[redirects]]
+  from = "/*"
+  to = "https://www.audiyn.arav.space/:splat"
+  status = 301
+  force = true
