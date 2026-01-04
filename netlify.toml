@@ -1,16 +1,16 @@
-[build]
-command = "npm install && npx turbo run build --filter=web"
-base = ""
-publish = "apps/web/.next"
+# [build]
+# command = "npm install && npx turbo run build --filter=web"
+# base = ""
+# publish = "apps/web/.next"
 
-[build.environment]
-NODE_VERSION = "20"
+# [build.environment]
+# NODE_VERSION = "20"
 
-[[plugins]]
-package = "@netlify/plugin-nextjs"
+# [[plugins]]
+# package = "@netlify/plugin-nextjs"
 
-[[redirects]]
-  from = "/*"
-  to = "https://www.audiyn.arav.space/:splat"
-  status = 301
-  force = true
+# [[redirects]]
+#   from = "/*"
+#   to = "https://www.audiyn.arav.space/:splat"
+#   status = 301
+#   force = true
