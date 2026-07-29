@@ -11,7 +11,7 @@ deleteRoomRouter.delete(
   async (req: Request, res: Response) => {
     try {
       const { roomId } = req.params;
-      const userId = (req as any).userId;
+      const userId = req.id;
 
       const room = await db.room.findUnique({ where: { id: roomId } });
       if (!room) return res.status(404).json({ message: "Room not found" });
@@ -22,9 +22,18 @@ deleteRoomRouter.delete(
           .json({ message: "You are not authorized to delete this room" });
       }
 
-      await db.roomUser.deleteMany({ where: { roomId: room.id } });
+      const streams = await db.streams.findMany({
+        where: { roomId: room.id },
+        select: { id: true },
+      });
+      const streamIds = streams.map((s) => s.id);
 
-      // Delete the room
+      if (streamIds.length > 0) {
+        await db.upvotes.deleteMany({ where: { streamId: { in: streamIds } } });
+        await db.streams.deleteMany({ where: { id: { in: streamIds } } });
+      }
+
+      await db.roomUser.deleteMany({ where: { roomId: room.id } });
       await db.room.delete({ where: { id: room.id } });
 
       return res
