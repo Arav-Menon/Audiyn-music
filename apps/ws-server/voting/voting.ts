@@ -1,10 +1,30 @@
 import WebSocket from "ws";
-import { DOWNVOTE, UPVOTE } from "../lib";
+import { DOWNVOTE, UPVOTE, VOTE_UPDATE } from "../lib";
 import { db } from "@repo/db/db";
+import { MemoryStore } from "../memory/memoryStore";
 
 export class Voting {
   public voting(socket: WebSocket) {
     this.votingHandler(socket);
+  }
+
+  private async broadcastVoteUpdate(roomId: string, videoId: string) {
+    try {
+      const stream = await db.streams.findUnique({
+        where: { videoId },
+        include: { _count: { select: { upvotes: true } } },
+      });
+
+      if (stream) {
+        MemoryStore.getInstance().broadcastToRoom(roomId, {
+          type: VOTE_UPDATE,
+          videoId,
+          votes: stream._count.upvotes,
+        });
+      }
+    } catch (err) {
+      console.error("Error broadcasting vote update:", err);
+    }
   }
 
   private votingHandler(socket: WebSocket) {
@@ -37,7 +57,7 @@ export class Voting {
             );
           }
 
-          const upvote = await db.upvotes.upsert({
+          await db.upvotes.upsert({
             where: {
               userId_videoId: {
                 userId: socket.userId!,
@@ -48,17 +68,11 @@ export class Voting {
             create: {
               userId: socket.userId!,
               videoId: videoId,
-              streamId: stream.id
+              streamId: stream.id,
             },
           });
 
-          socket.send(
-            JSON.stringify({
-              type: "success",
-              message: "successfully upvoted",
-              upvote,
-            })
-          );
+          await this.broadcastVoteUpdate(roomId, videoId);
         } catch (err) {
           console.log(err);
           socket.send(
@@ -84,7 +98,7 @@ export class Voting {
         }
 
         try {
-          const downVote = await db.upvotes.delete({
+          await db.upvotes.delete({
             where: {
               userId_videoId: {
                 userId: socket.userId!,
@@ -93,19 +107,13 @@ export class Voting {
             },
           });
 
-          socket.send(
-            JSON.stringify({
-              type: "success",
-              message: "successfully downvoted",
-              downVote,
-            })
-          );
+          await this.broadcastVoteUpdate(roomId, videoId);
         } catch (err) {
           console.log(err);
           socket.send(
             JSON.stringify({
               type: "error",
-              message: "Failed to upvote",
+              message: "Failed to downvote",
               error: err,
             })
           );
