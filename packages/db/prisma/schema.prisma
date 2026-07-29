@@ -17,6 +17,7 @@ model User {
   upvotes   Upvotes[]
   room      Room[]
   roomUser  RoomUser[]
+  recentRooms RecentRoom[]
   createdAt DateTime   @default(now())
 }
 
@@ -32,6 +33,7 @@ model Streams {
   upvotes      Upvotes[]
   userId       String
   user         User       @relation(fields: [userId], references: [id])
+  createdAt    DateTime   @default(now())
 
   @@unique([videoId])
 }
@@ -57,6 +59,7 @@ model Room {
   createdBy User      @relation(fields: [adminId], references: [id])
   createdAt DateTime  @default(now())
   streams   Streams[]
+  recentRooms RecentRoom[]
 }
 
 model RoomUser {
@@ -65,6 +68,21 @@ model RoomUser {
   roomId       String
   user         User     @relation(fields: [userId], references: [id])
   joinedRoomAt DateTime @default(now())
+
+  @@unique([userId, roomId])
+}
+
+model RecentRoom {
+  id           String   @id @default(uuid())
+  userId       String
+  roomId       String
+  roomName     String
+  roomCode     String
+  hostName     String?
+  lastJoinedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  room Room @relation(fields: [roomId], references: [id])
 
   @@unique([userId, roomId])
 }
