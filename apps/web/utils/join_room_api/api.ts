@@ -1,13 +1,6 @@
 import axios from "axios";
 import { API_URL } from "../api_url";
 
-interface CreateRoom {
-  name: string;
-  code: string;
-  isPrivate?: string;
-  password?: string;
-}
-
 const axiosInstence = axios.create({
   baseURL: API_URL,
   withCredentials: true,
@@ -22,24 +15,13 @@ export const createRoom = async (
   isPrivate: boolean,
   password: string | null
 ) => {
-  const response = await axiosInstence.post("/room/create-room", {
-    name,
-    code,
-    isPrivate,
-    password: isPrivate ? password : null,
-  });
-  console.table(response);
-  console.log(response.data);
-  console.log(response.headers);
+  const body: Record<string, unknown> = { name, code, isPrivate };
+  if (isPrivate) body.password = password;
 
-  const res = response.data.newRoom.id;
-
-  console.log("ROOM ID:", res);
+  const response = await axiosInstence.post("/room/create-room", body);
 
   return response.data.newRoom.id;
 };
-
-console.log(createRoom);
 
 export const getRoom = async (roomId: string) => {
   const response = await axiosInstence.get(`/room/${roomId}`);
